@@ -1,6 +1,7 @@
 "use strict";
 exports.__esModule = true;
 var world_1 = require("./world");
+var general_1 = require("./general");
 var world_2 = require("./world");
 var world_3 = require("./world");
 var character_1 = require("./character");
@@ -14,9 +15,8 @@ var Game = (function () {
         //update background
         canvas_1.Canvas.updateBackground();
         //update each chunk
-        for (var _i = 0, _a = Game.world.chunks; _i < _a.length; _i++) {
-            var chunk = _a[_i];
-            Game.world.drawChunk(chunk);
+        for (var chunk in Game.world.chunks) {
+            Game.world.drawChunk(Game.world.chunks[chunk]);
         }
         //update character
         if (updateResolution) {
@@ -33,6 +33,23 @@ var Game = (function () {
     Game.start = function () {
         Game.world = new world_1.World();
         Game.player = new character_1.Player(1, "asd");
+    };
+    Game.checkPlayerPosition = function () {
+        var pos = Game.player.position;
+        var loadsens = world_2.Chunk.loadsensitivity;
+        if (pos.tile.x == 0 + loadsens) {
+            Game.world.generateChunk(pos.chunk.x, pos.chunk.y, general_1.Direction.LEFT);
+        }
+        if (pos.tile.x == (world_2.Chunk.tilesperside - 1 - loadsens)) {
+            Game.world.generateChunk(pos.chunk.x, pos.chunk.y, general_1.Direction.RIGHT);
+        }
+        if (pos.tile.y == 0 + loadsens) {
+            Game.world.generateChunk(pos.chunk.x, pos.chunk.y, general_1.Direction.DOWN);
+        }
+        if (pos.tile.y == (world_2.Chunk.tilesperside - 1 - loadsens)) {
+            Game.world.generateChunk(pos.chunk.x, pos.chunk.y, general_1.Direction.UP);
+        }
+        Game.world.generateChunk(pos.chunk.x, pos.chunk.y);
     };
     Game.getDebugLines = function () {
         var debugLines = [
@@ -59,6 +76,7 @@ var Game = (function () {
     Game.loop = function () {
         requestAnimationFrame(Game.loop);
         Game.player.walk(Game.key);
+        Game.checkPlayerPosition();
         Game.updateScreen();
     };
     return Game;

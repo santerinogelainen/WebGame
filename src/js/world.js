@@ -12,30 +12,12 @@ var Tile = (function () {
 Tile.tilesize = 50;
 exports.Tile = Tile;
 var Chunk = (function () {
-    function Chunk(seed, x, y, direction) {
+    function Chunk(seed, x, y) {
         this.tiles = [];
         this.x = x;
         this.y = y;
-        this.checkDirection(direction);
         this.generateTiles(seed);
     }
-    Chunk.prototype.checkDirection = function (dir) {
-        switch (dir) {
-            case general_1.Direction.UP:
-                this.y += 1;
-                break;
-            case general_1.Direction.RIGHT:
-                this.x += 1;
-                break;
-            case general_1.Direction.DOWN:
-                this.y -= 1;
-                break;
-            case general_1.Direction.LEFT:
-                this.x -= 1;
-                break;
-            default:
-        }
-    };
     Chunk.prototype.generateTiles = function (seed) {
         var r = 0, c = 0;
         while (r < Chunk.tilesperside) {
@@ -52,18 +34,48 @@ var Chunk = (function () {
 }());
 Chunk.tilesperside = 7; //USE ONLY NUMBERS WHERE % 2 = 1;
 Chunk.chunksize = Chunk.tilesperside * Tile.tilesize;
+Chunk.loadsensitivity = 1;
 exports.Chunk = Chunk;
 var World = (function () {
     function World() {
-        this.chunks = [];
+        this.chunks = {};
         this.seed = this.generateSeed(-2147483647, 2147483647);
         this.generateChunk(0, 0, null);
     }
     World.prototype.generateChunk = function (x, y, direction) {
-        var chunk = new Chunk(this.seed, x, y, direction);
-        console.log(chunk);
-        this.drawChunk(chunk);
-        this.chunks.push(chunk);
+        var coords = this.calculateDirection(x, y, direction);
+        if (!this.chunkExists(coords.x, coords.y)) {
+            var chunk = new Chunk(this.seed, coords.x, coords.y);
+            console.log(this.chunks);
+            this.drawChunk(chunk);
+            this.chunks[World.coordinatesToString(coords.x, coords.y)] = chunk;
+        }
+    };
+    World.prototype.chunkExists = function (x, y) {
+        return this.chunks[World.coordinatesToString(x, y)] != null;
+    };
+    World.coordinatesToString = function (x, y) {
+        var coords = x.toString() + y.toString();
+        coords = coords.replace(/-/g, "m");
+        return coords;
+    };
+    World.prototype.calculateDirection = function (x, y, dir) {
+        switch (dir) {
+            case general_1.Direction.UP:
+                y += 1;
+                break;
+            case general_1.Direction.RIGHT:
+                x += 1;
+                break;
+            case general_1.Direction.DOWN:
+                y -= 1;
+                break;
+            case general_1.Direction.LEFT:
+                x -= 1;
+                break;
+            default:
+        }
+        return { "x": x, "y": y };
     };
     World.prototype.drawChunk = function (chunk) {
         var chunkpositionx = canvas_1.Canvas.center.x + (Chunk.chunksize * chunk.x) - (Chunk.chunksize / 2);

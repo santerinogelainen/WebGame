@@ -1,4 +1,5 @@
 import { World } from "./world";
+import { Direction } from "./general";
 import { Chunk } from "./world";
 import { Tile } from "./world";
 import { Player } from "./character";
@@ -15,8 +16,8 @@ export class Game {
     //update background
     Canvas.updateBackground();
     //update each chunk
-    for (let chunk of Game.world.chunks) {
-      Game.world.drawChunk(chunk);
+    for (let chunk in Game.world.chunks) {
+      Game.world.drawChunk(Game.world.chunks[chunk]);
     }
     //update character
     if (updateResolution) {
@@ -33,6 +34,24 @@ export class Game {
   static start() {
     Game.world = new World();
     Game.player = new Player(1, "asd");
+  }
+
+  static checkPlayerPosition() {
+    let pos = Game.player.position;
+    let loadsens = Chunk.loadsensitivity;
+    if (pos.tile.x == 0 + loadsens) {
+      Game.world.generateChunk(pos.chunk.x, pos.chunk.y, Direction.LEFT);
+    }
+    if (pos.tile.x == (Chunk.tilesperside - 1 - loadsens)) {
+      Game.world.generateChunk(pos.chunk.x, pos.chunk.y, Direction.RIGHT);
+    }
+    if (pos.tile.y == 0 + loadsens) {
+      Game.world.generateChunk(pos.chunk.x, pos.chunk.y, Direction.DOWN);
+    }
+    if (pos.tile.y == (Chunk.tilesperside - 1 - loadsens)) {
+      Game.world.generateChunk(pos.chunk.x, pos.chunk.y, Direction.UP);
+    }
+    Game.world.generateChunk(pos.chunk.x, pos.chunk.y);
   }
 
   static getDebugLines(): Array<string> {
@@ -61,6 +80,7 @@ export class Game {
   static loop() {
     requestAnimationFrame(Game.loop);
     Game.player.walk(Game.key);
+    Game.checkPlayerPosition();
     Game.updateScreen();
   }
 

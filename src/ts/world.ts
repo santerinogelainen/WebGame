@@ -18,33 +18,14 @@ export class Chunk {
   tiles: Array<Tile> = [];
   static tilesperside:number = 7; //USE ONLY NUMBERS WHERE % 2 = 1;
   static chunksize:number = Chunk.tilesperside * Tile.tilesize;
+  static loadsensitivity:number = 1;
   x: number;
   y: number;
 
-  constructor(seed:number, x:number, y: number, direction?: number) {
+  constructor(seed:number, x:number, y: number) {
     this.x = x;
     this.y = y;
-    this.checkDirection(direction);
     this.generateTiles(seed);
-  }
-
-  checkDirection(dir?: number) {
-    switch (dir) {
-      case Direction.UP:
-        this.y += 1;
-        break;
-      case Direction.RIGHT:
-        this.x += 1;
-        break;
-      case Direction.DOWN:
-        this.y -= 1;
-        break;
-      case Direction.LEFT:
-        this.x -= 1;
-        break;
-      default:
-        //do nothing
-    }
   }
 
   generateTiles(seed:number): void {
@@ -64,7 +45,7 @@ export class Chunk {
 export class World {
 
   seed: number;
-  chunks: Array<Chunk> = [];
+  chunks: any = {};
 
   constructor() {
     this.seed = this.generateSeed(-2147483647, 2147483647);
@@ -72,14 +53,43 @@ export class World {
   }
 
   generateChunk(x:number, y:number, direction?:number): void {
-    let chunk = new Chunk(this.seed, x, y, direction);
-    console.log(chunk);
-    this.drawChunk(chunk);
-    this.chunks.push(chunk);
+    let coords = this.calculateDirection(x, y, direction);
+    if (!this.chunkExists(coords.x, coords.y)) {
+      let chunk = new Chunk(this.seed, coords.x, coords.y);
+      console.log(this.chunks);
+      this.drawChunk(chunk);
+      this.chunks[World.coordinatesToString(coords.x, coords.y)] = chunk;
+    }
   }
 
-  checkChunkExistance(x:number, y:number, direction?:number) {
+  chunkExists(x:number, y:number): boolean {
+    return this.chunks[World.coordinatesToString(x, y)] != null;
+  }
 
+  static coordinatesToString(x: number, y:number): string {
+    let coords:string = x.toString() + y.toString();
+    coords = coords.replace(/-/g, "m");
+    return coords;
+  }
+
+  calculateDirection(x: number, y: number, dir?: number) {
+    switch (dir) {
+      case Direction.UP:
+        y += 1;
+        break;
+      case Direction.RIGHT:
+        x += 1;
+        break;
+      case Direction.DOWN:
+        y -= 1;
+        break;
+      case Direction.LEFT:
+        x -= 1;
+        break;
+      default:
+        //do nothing
+    }
+    return {"x": x, "y": y};
   }
 
   drawChunk(chunk: Chunk) {
