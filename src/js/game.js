@@ -2,6 +2,7 @@
 exports.__esModule = true;
 var world_1 = require("./world");
 var general_1 = require("./general");
+var general_2 = require("./general");
 var world_2 = require("./world");
 var world_3 = require("./world");
 var character_1 = require("./character");
@@ -10,12 +11,18 @@ var debug_1 = require("./debug");
 var Game = (function () {
     function Game() {
     }
+    Game.updateResolution = function () {
+        canvas_1.Canvas.updateResolution();
+        world_2.Chunk.calculatePerScreenRatio();
+        Game.updateScreen(true);
+    };
     Game.updateScreen = function (updateResolution) {
         if (updateResolution === void 0) { updateResolution = false; }
         //update background
         canvas_1.Canvas.updateBackground();
         //update each chunk
-        for (var chunk in Game.world.chunks) {
+        for (var _i = 0, _a = Game.world.onscreen; _i < _a.length; _i++) {
+            var chunk = _a[_i];
             Game.world.drawChunk(Game.world.chunks[chunk]);
         }
         //update character
@@ -73,9 +80,30 @@ var Game = (function () {
             Game.player.moving = false;
         }
     };
+    Game.comparePositions = function (oldPosition, newPosition) {
+        if (oldPosition.x != newPosition.x) {
+            if (oldPosition.x > newPosition.x) {
+                Game.world.loadChunksOnWalk(general_2.Position.X, general_1.Direction.LEFT, newPosition.x, newPosition.y);
+            }
+            if (oldPosition.x < newPosition.x) {
+                Game.world.loadChunksOnWalk(general_2.Position.X, general_1.Direction.RIGHT, newPosition.x, newPosition.y);
+            }
+        }
+        if (oldPosition.y != newPosition.y) {
+            if (oldPosition.y > newPosition.y) {
+                Game.world.loadChunksOnWalk(general_2.Position.Y, general_1.Direction.DOWN, newPosition.x, newPosition.y);
+            }
+            if (oldPosition.y < newPosition.y) {
+                Game.world.loadChunksOnWalk(general_2.Position.Y, general_1.Direction.UP, newPosition.x, newPosition.y);
+            }
+        }
+    };
     Game.loop = function () {
         requestAnimationFrame(Game.loop);
+        var oldPosition = { x: Game.player.position.chunk.x, y: Game.player.position.chunk.y };
         Game.player.walk(Game.key);
+        var newPosition = { x: Game.player.position.chunk.x, y: Game.player.position.chunk.y };
+        Game.comparePositions(oldPosition, newPosition);
         Game.checkPlayerPosition();
         Game.updateScreen();
     };

@@ -20,7 +20,7 @@ window.onload = () => {
   Game.world.generateChunk(0, 1, Direction.LEFT);
   Game.world.generateChunk(-1, 1, Direction.DOWN);
   Game.world.generateChunk(0, 1, Direction.RIGHT);*/
-  Game.world.generateChunk(0, 0, Direction.RIGHT);
+  //Game.world.generateChunk(0, 0, Direction.RIGHT);
 
   window.addEventListener("keydown", Debug.toggle, false);
   window.addEventListener("keydown", Game.keypress, false);
@@ -28,6 +28,5 @@ window.onload = () => {
 };
 
 window.onresize = () => {
-  Canvas.updateResolution();
-  Game.updateScreen(true);
+  Game.updateResolution();
 }

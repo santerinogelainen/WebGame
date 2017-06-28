@@ -22,6 +22,9 @@ class Character {
   draw(x: number, y: number){};
 }
 
+
+
+
 export class Player extends Character {
 
   static size:number = 25;
@@ -37,7 +40,7 @@ export class Player extends Character {
     this.position.screen.y = y;
   }
 
-  updatePosition(position: number) {
+  updatePosition(position: number): void {
     switch(position) {
       case Position.X:
         this.position.chunk.x = Math.round(this.position.world.x / Chunk.chunksize);

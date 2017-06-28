@@ -2,6 +2,7 @@
 exports.__esModule = true;
 var canvas_1 = require("./canvas");
 var general_1 = require("./general");
+var general_2 = require("./general");
 var Tile = (function () {
     function Tile(x, y) {
         this.x = x;
@@ -18,6 +19,22 @@ var Chunk = (function () {
         this.y = y;
         this.generateTiles(seed);
     }
+    Chunk.isOnScreen = function (chunk, playerx, playery) {
+        var xplus = Math.ceil(playerx + (Chunk.perscreen / 2));
+        var xminus = Math.floor(playerx - (Chunk.perscreen / 2));
+        var yplus = Math.ceil(playery + (Chunk.perscreen / 2));
+        var yminus = Math.floor(playery - (Chunk.perscreen / 2));
+        if (chunk.x > xplus || chunk.x < xminus || chunk.y > yplus || chunk.y < yminus) {
+            return false;
+        }
+        else {
+            return true;
+        }
+    };
+    Chunk.calculatePerScreenRatio = function () {
+        Chunk.perscreen.x = Math.ceil(canvas_1.Canvas.width / Chunk.chunksize);
+        Chunk.perscreen.y = Math.ceil(canvas_1.Canvas.height / Chunk.chunksize);
+    };
     Chunk.prototype.generateTiles = function (seed) {
         var r = 0, c = 0;
         while (r < Chunk.tilesperside) {
@@ -35,20 +52,91 @@ var Chunk = (function () {
 Chunk.tilesperside = 7; //USE ONLY NUMBERS WHERE % 2 = 1;
 Chunk.chunksize = Chunk.tilesperside * Tile.tilesize;
 Chunk.loadsensitivity = 1;
+Chunk.perscreen = { x: 0, y: 0 };
 exports.Chunk = Chunk;
 var World = (function () {
     function World() {
         this.chunks = {};
+        this.onscreen = [];
+        Chunk.calculatePerScreenRatio();
         this.seed = this.generateSeed(-2147483647, 2147483647);
         this.generateChunk(0, 0, null);
     }
+    World.prototype.loadChunk = function (x, y) {
+        if (this.chunkExists(x, y)) {
+            console.log(this.onscreen.indexOf(World.coordinatesToString(x, y)));
+            if (this.onscreen.indexOf(World.coordinatesToString(x, y)) == -1) {
+                this.onscreen.push(World.coordinatesToString(x, y));
+            }
+        }
+    };
+    World.prototype.unloadChunk = function (x, y) {
+        var arrayindex = this.onscreen.indexOf(World.coordinatesToString(x, y));
+        if (arrayindex > -1) {
+            this.onscreen.splice(arrayindex, 1);
+        }
+    };
+    //load a bunch of chunks
+    World.prototype.loadChunksOnWalk = function (pos, dir, playerposx, playerposy) {
+        var indextop, indexbottom, x, y, unloadx, unloady;
+        //might seem a bit backwards mut if we move on the x axis
+        //we want to loop through on the y axis
+        if (pos == general_2.Position.X) {
+            indextop = playerposy + Math.ceil(Chunk.perscreen.y / 2);
+            indexbottom = playerposy - Math.ceil(Chunk.perscreen.y / 2);
+        }
+        else if (pos == general_2.Position.Y) {
+            indextop = playerposx + Math.ceil(Chunk.perscreen.x / 2);
+            indexbottom = playerposx - Math.ceil(Chunk.perscreen.x / 2);
+        }
+        while (indextop >= indexbottom) {
+            if (pos == general_2.Position.X) {
+                if (dir == general_1.Direction.RIGHT) {
+                    x = playerposx + Math.ceil(Chunk.perscreen.x / 2) + 1;
+                    y = indextop;
+                    unloadx = playerposx - Math.ceil(Chunk.perscreen.x / 2) - 2;
+                    unloady = indextop;
+                }
+                if (dir == general_1.Direction.LEFT) {
+                    x = playerposx - Math.ceil(Chunk.perscreen.x / 2) - 1;
+                    y = indextop;
+                    unloadx = playerposx + Math.ceil(Chunk.perscreen.x / 2) + 2;
+                    unloady = indextop;
+                }
+            }
+            if (pos == general_2.Position.Y) {
+                if (dir == general_1.Direction.UP) {
+                    x = indextop;
+                    y = playerposy + Math.ceil(Chunk.perscreen.y / 2) + 1;
+                    unloadx = indextop;
+                    unloady = playerposy - Math.ceil(Chunk.perscreen.y / 2) - 2;
+                }
+                if (dir == general_1.Direction.DOWN) {
+                    x = indextop;
+                    y = playerposy - Math.ceil(Chunk.perscreen.y / 2) - 1;
+                    unloadx = indextop;
+                    unloady = playerposy + Math.ceil(Chunk.perscreen.y / 2) + 2;
+                }
+            }
+            console.log("x: " + x);
+            console.log("y: " + y);
+            console.log("unloadx" + unloadx);
+            console.log("unloady" + unloady);
+            console.log("------");
+            this.unloadChunk(unloadx, unloady);
+            this.loadChunk(x, y);
+            indextop--;
+        }
+        console.log(this.onscreen);
+        console.log("--------------------------------------------------------------");
+    };
     World.prototype.generateChunk = function (x, y, direction) {
         var coords = this.calculateDirection(x, y, direction);
         if (!this.chunkExists(coords.x, coords.y)) {
             var chunk = new Chunk(this.seed, coords.x, coords.y);
-            console.log(this.chunks);
             this.drawChunk(chunk);
             this.chunks[World.coordinatesToString(coords.x, coords.y)] = chunk;
+            this.loadChunk(coords.x, coords.y);
         }
     };
     World.prototype.chunkExists = function (x, y) {

@@ -1,5 +1,6 @@
 import { World } from "./world";
 import { Direction } from "./general";
+import { Position } from "./general";
 import { Chunk } from "./world";
 import { Tile } from "./world";
 import { Player } from "./character";
@@ -12,11 +13,17 @@ export class Game {
   static player: Player;
   static key = {};
 
+  static updateResolution() {
+    Canvas.updateResolution();
+    Chunk.calculatePerScreenRatio();
+    Game.updateScreen(true);
+  }
+
   static updateScreen(updateResolution:boolean = false) {
     //update background
     Canvas.updateBackground();
     //update each chunk
-    for (let chunk in Game.world.chunks) {
+    for (let chunk of Game.world.onscreen) {
       Game.world.drawChunk(Game.world.chunks[chunk]);
     }
     //update character
@@ -77,9 +84,31 @@ export class Game {
     }
   }
 
+  static comparePositions(oldPosition, newPosition): void {
+    if (oldPosition.x != newPosition.x) {
+      if (oldPosition.x > newPosition.x) {
+        Game.world.loadChunksOnWalk(Position.X, Direction.LEFT, newPosition.x, newPosition.y);
+      }
+      if (oldPosition.x < newPosition.x) {
+        Game.world.loadChunksOnWalk(Position.X, Direction.RIGHT, newPosition.x, newPosition.y);
+      }
+    }
+    if (oldPosition.y != newPosition.y) {
+      if (oldPosition.y > newPosition.y) {
+        Game.world.loadChunksOnWalk(Position.Y, Direction.DOWN, newPosition.x, newPosition.y);
+      }
+      if (oldPosition.y < newPosition.y) {
+        Game.world.loadChunksOnWalk(Position.Y, Direction.UP, newPosition.x, newPosition.y);
+      }
+    }
+  }
+
   static loop() {
     requestAnimationFrame(Game.loop);
+    let oldPosition = {x: Game.player.position.chunk.x, y: Game.player.position.chunk.y};
     Game.player.walk(Game.key);
+    let newPosition = {x: Game.player.position.chunk.x, y: Game.player.position.chunk.y};
+    Game.comparePositions(oldPosition, newPosition);
     Game.checkPlayerPosition();
     Game.updateScreen();
   }
