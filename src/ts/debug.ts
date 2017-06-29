@@ -4,6 +4,7 @@ import { Canvas } from "./canvas";
 export class Debug {
 
   static on:boolean = false;
+  static lines:boolean = false;
   static lineHeight:number = 15;
 
   static draw(lines: Array<string>) {
@@ -25,6 +26,14 @@ export class Debug {
         Debug.on = false;
       } else {
         Debug.on = true;
+      }
+    }
+    if (e.keyCode === 115) {
+      e.preventDefault();
+      if (Debug.lines == true) {
+        Debug.lines = false;
+      } else {
+        Debug.lines = true;
       }
     }
   }

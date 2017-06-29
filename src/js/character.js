@@ -13,7 +13,7 @@ exports.__esModule = true;
 var general_1 = require("./general");
 var canvas_1 = require("./canvas");
 var world_1 = require("./world");
-var world_2 = require("./world");
+var tiles_1 = require("./tiles");
 var Character = (function () {
     function Character(id, name) {
         this.id = id;
@@ -34,7 +34,6 @@ var Player = (function (_super) {
             tile: { x: Math.floor(world_1.Chunk.tilesperside / 2), y: Math.floor(world_1.Chunk.tilesperside / 2) },
             screen: { x: 0, y: 0 }
         };
-        console.log(_this.position);
         _this.draw(canvas_1.Canvas.center.x, canvas_1.Canvas.center.y);
         return _this;
     }
@@ -50,11 +49,11 @@ var Player = (function (_super) {
         switch (position) {
             case general_1.Position.X:
                 this.position.chunk.x = Math.round(this.position.world.x / world_1.Chunk.chunksize);
-                this.position.tile.x = Math.round(world_1.Chunk.tilesperside / 2) + Math.round((this.position.world.x / world_2.Tile.tilesize)) - (this.position.chunk.x * world_1.Chunk.tilesperside) - 1;
+                this.position.tile.x = Math.round(world_1.Chunk.tilesperside / 2) + Math.round((this.position.world.x / tiles_1.Tile.tilesize)) - (this.position.chunk.x * world_1.Chunk.tilesperside) - 1;
                 break;
             case general_1.Position.Y:
                 this.position.chunk.y = Math.round(this.position.world.y / world_1.Chunk.chunksize);
-                this.position.tile.y = Math.round(world_1.Chunk.tilesperside / 2) + Math.round((this.position.world.y / world_2.Tile.tilesize)) - (this.position.chunk.y * world_1.Chunk.tilesperside) - 1;
+                this.position.tile.y = Math.round(world_1.Chunk.tilesperside / 2) + Math.round((this.position.world.y / tiles_1.Tile.tilesize)) - (this.position.chunk.y * world_1.Chunk.tilesperside) - 1;
                 break;
             default:
                 console.log("Error: unknown position " + position);

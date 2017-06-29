@@ -1,18 +1,9 @@
 import { Canvas } from "./canvas";
 import { Direction } from "./general";
 import { Position } from "./general";
-
-export class Tile {
-
-  static tilesize: number = 50;
-  x: number;
-  y: number;
-
-  constructor(x: number, y: number) {
-    this.x = x;
-    this.y = y;
-  }
-}
+import { Tile } from "./tiles";
+import { Grass } from "./tiles";
+import { Debug } from "./debug";
 
 export class Chunk {
 
@@ -51,7 +42,7 @@ export class Chunk {
     let r:number = 0, c:number = 0;
     while (r < Chunk.tilesperside) {
       while (c < Chunk.tilesperside) {
-        let tile: Tile = new Tile(r, c);
+        let tile: Grass = new Grass(r, c);
         this.tiles.push(tile);
         c++;
       }
@@ -181,12 +172,19 @@ export class World {
       let tilepositionx:number = chunkpositionx + (Tile.tilesize * tile.x) - (Tile.tilesize / 2);
       let tilepositiony:number = chunkpositiony + (Tile.tilesize * tile.y) - (Tile.tilesize / 2);
       Canvas.context.beginPath();
-      Canvas.context.rect(tilepositionx, tilepositiony, Tile.tilesize + 1, Tile.tilesize + 1);
-      Canvas.context.fillStyle = "#27ae60";
-      Canvas.context.fill();
-      Canvas.context.strokeStyle = "#2ecc71";
-      Canvas.context.stroke();
+      Canvas.context.drawImage(tile.texture, tilepositionx, tilepositiony, Tile.tilesize, Tile.tilesize);
+      if (Debug.lines) {
+        Canvas.context.rect(tilepositionx, tilepositiony, Tile.tilesize, Tile.tilesize);
+        Canvas.context.strokeStyle = "rgba(255, 255, 255, 0.5)";
+        Canvas.context.stroke();
+      }
       i++;
+    }
+    if (Debug.lines) {
+      Canvas.context.beginPath();
+      Canvas.context.rect(chunkpositionx - (Tile.tilesize / 2), chunkpositiony - (Tile.tilesize / 2), Chunk.chunksize, Chunk.chunksize);
+      Canvas.context.strokeStyle = "red";
+      Canvas.context.stroke();
     }
   }
 

@@ -3,15 +3,9 @@ exports.__esModule = true;
 var canvas_1 = require("./canvas");
 var general_1 = require("./general");
 var general_2 = require("./general");
-var Tile = (function () {
-    function Tile(x, y) {
-        this.x = x;
-        this.y = y;
-    }
-    return Tile;
-}());
-Tile.tilesize = 50;
-exports.Tile = Tile;
+var tiles_1 = require("./tiles");
+var tiles_2 = require("./tiles");
+var debug_1 = require("./debug");
 var Chunk = (function () {
     function Chunk(seed, x, y) {
         this.tiles = [];
@@ -39,7 +33,7 @@ var Chunk = (function () {
         var r = 0, c = 0;
         while (r < Chunk.tilesperside) {
             while (c < Chunk.tilesperside) {
-                var tile = new Tile(r, c);
+                var tile = new tiles_2.Grass(r, c);
                 this.tiles.push(tile);
                 c++;
             }
@@ -50,7 +44,7 @@ var Chunk = (function () {
     return Chunk;
 }());
 Chunk.tilesperside = 7; //USE ONLY NUMBERS WHERE % 2 = 1;
-Chunk.chunksize = Chunk.tilesperside * Tile.tilesize;
+Chunk.chunksize = Chunk.tilesperside * tiles_1.Tile.tilesize;
 Chunk.loadsensitivity = 2;
 Chunk.perscreen = { x: 0, y: 0 };
 exports.Chunk = Chunk;
@@ -161,15 +155,22 @@ var World = (function () {
         var i = 0;
         for (var _i = 0, _a = chunk.tiles; _i < _a.length; _i++) {
             var tile = _a[_i];
-            var tilepositionx = chunkpositionx + (Tile.tilesize * tile.x) - (Tile.tilesize / 2);
-            var tilepositiony = chunkpositiony + (Tile.tilesize * tile.y) - (Tile.tilesize / 2);
+            var tilepositionx = chunkpositionx + (tiles_1.Tile.tilesize * tile.x) - (tiles_1.Tile.tilesize / 2);
+            var tilepositiony = chunkpositiony + (tiles_1.Tile.tilesize * tile.y) - (tiles_1.Tile.tilesize / 2);
             canvas_1.Canvas.context.beginPath();
-            canvas_1.Canvas.context.rect(tilepositionx, tilepositiony, Tile.tilesize + 1, Tile.tilesize + 1);
-            canvas_1.Canvas.context.fillStyle = "#27ae60";
-            canvas_1.Canvas.context.fill();
-            canvas_1.Canvas.context.strokeStyle = "#2ecc71";
-            canvas_1.Canvas.context.stroke();
+            canvas_1.Canvas.context.drawImage(tile.texture, tilepositionx, tilepositiony, tiles_1.Tile.tilesize, tiles_1.Tile.tilesize);
+            if (debug_1.Debug.lines) {
+                canvas_1.Canvas.context.rect(tilepositionx, tilepositiony, tiles_1.Tile.tilesize, tiles_1.Tile.tilesize);
+                canvas_1.Canvas.context.strokeStyle = "rgba(255, 255, 255, 0.5)";
+                canvas_1.Canvas.context.stroke();
+            }
             i++;
+        }
+        if (debug_1.Debug.lines) {
+            canvas_1.Canvas.context.beginPath();
+            canvas_1.Canvas.context.rect(chunkpositionx - (tiles_1.Tile.tilesize / 2), chunkpositiony - (tiles_1.Tile.tilesize / 2), Chunk.chunksize, Chunk.chunksize);
+            canvas_1.Canvas.context.strokeStyle = "red";
+            canvas_1.Canvas.context.stroke();
         }
     };
     World.prototype.generateSeed = function (min, max) {

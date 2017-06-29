@@ -1,7 +1,7 @@
 import { Position as Pos } from "./general";
 import { Canvas } from "./canvas";
 import { Chunk } from "./world";
-import { Tile } from "./world";
+import { Tile } from "./tiles";
 
 class Character {
   id: number;
@@ -33,7 +33,6 @@ export class Player extends Character {
 
   constructor(id: number, name:string) {
     super(id, name);
-    console.log(this.position);
     this.draw(Canvas.center.x, Canvas.center.y);
   }
 

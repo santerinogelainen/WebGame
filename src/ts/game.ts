@@ -2,7 +2,7 @@ import { World } from "./world";
 import { Direction } from "./general";
 import { Position } from "./general";
 import { Chunk } from "./world";
-import { Tile } from "./world";
+import { Tile } from "./tiles";
 import { Player } from "./character";
 import { Canvas } from "./canvas";
 import { Debug } from "./debug";

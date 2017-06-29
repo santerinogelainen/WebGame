@@ -26,9 +26,19 @@ var Debug = (function () {
                 Debug.on = true;
             }
         }
+        if (e.keyCode === 115) {
+            e.preventDefault();
+            if (Debug.lines == true) {
+                Debug.lines = false;
+            }
+            else {
+                Debug.lines = true;
+            }
+        }
     };
     return Debug;
 }());
 Debug.on = false;
+Debug.lines = false;
 Debug.lineHeight = 15;
 exports.Debug = Debug;

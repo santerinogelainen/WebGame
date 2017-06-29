@@ -1,7 +1,7 @@
 
 import { Canvas } from "./canvas";
 import { Chunk } from "./world";
-import { Tile } from "./world";
+import { Tile } from "./tiles";
 import { Direction } from "./general";
 import { Color } from "./general";
 import { Game } from "./game";

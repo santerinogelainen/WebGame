@@ -4,7 +4,7 @@ var world_1 = require("./world");
 var general_1 = require("./general");
 var general_2 = require("./general");
 var world_2 = require("./world");
-var world_3 = require("./world");
+var tiles_1 = require("./tiles");
 var character_1 = require("./character");
 var canvas_1 = require("./canvas");
 var debug_1 = require("./debug");
@@ -79,7 +79,7 @@ var Game = (function () {
             "Tile position: x=" + Game.player.position.tile.x + " y=" + Game.player.position.tile.y,
             "Tiles per chunk (side): " + world_2.Chunk.tilesperside,
             "Chunk size: " + world_2.Chunk.chunksize,
-            "Tile size: " + world_3.Tile.tilesize
+            "Tile size: " + tiles_1.Tile.tilesize
         ];
         return debugLines;
     };
