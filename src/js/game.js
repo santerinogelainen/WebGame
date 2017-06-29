@@ -44,15 +44,15 @@ var Game = (function () {
     Game.checkPlayerPosition = function () {
         var pos = Game.player.position;
         var loadsens = world_2.Chunk.loadsensitivity;
-        if (pos.tile.x <= 1 + loadsens) {
+        if (pos.tile.x <= loadsens) {
             Game.world.generateChunk(pos.chunk.x, pos.chunk.y, general_1.Direction.LEFT);
         }
         if (pos.tile.x >= (world_2.Chunk.tilesperside - 1 - loadsens)) {
             Game.world.generateChunk(pos.chunk.x, pos.chunk.y, general_1.Direction.RIGHT);
         }
-        if (pos.tile.y <= 1 + loadsens) {
+        if (pos.tile.y <= loadsens) {
             Game.world.generateChunk(pos.chunk.x, pos.chunk.y, general_1.Direction.DOWN);
-            if (pos.tile.x <= 1 + loadsens) {
+            if (pos.tile.x <= loadsens) {
                 Game.world.generateChunk(pos.chunk.x, pos.chunk.y - 1, general_1.Direction.LEFT);
             }
             if (pos.tile.x >= (world_2.Chunk.tilesperside - 1 - loadsens)) {
@@ -61,7 +61,7 @@ var Game = (function () {
         }
         if (pos.tile.y >= (world_2.Chunk.tilesperside - 1 - loadsens)) {
             Game.world.generateChunk(pos.chunk.x, pos.chunk.y, general_1.Direction.UP);
-            if (pos.tile.x <= 1 + loadsens) {
+            if (pos.tile.x <= loadsens) {
                 Game.world.generateChunk(pos.chunk.x, pos.chunk.y + 1, general_1.Direction.LEFT);
             }
             if (pos.tile.x >= (world_2.Chunk.tilesperside - 1 - loadsens)) {

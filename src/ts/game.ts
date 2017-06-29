@@ -46,15 +46,15 @@ export class Game {
   static checkPlayerPosition() {
     let pos = Game.player.position;
     let loadsens = Chunk.loadsensitivity;
-    if (pos.tile.x <= 1 + loadsens) { //left
+    if (pos.tile.x <= loadsens) { //left
       Game.world.generateChunk(pos.chunk.x, pos.chunk.y, Direction.LEFT);
     }
     if (pos.tile.x >= (Chunk.tilesperside - 1 - loadsens)) { //right
       Game.world.generateChunk(pos.chunk.x, pos.chunk.y, Direction.RIGHT);
     }
-    if (pos.tile.y <= 1 + loadsens) { //bottom
+    if (pos.tile.y <= loadsens) { //bottom
       Game.world.generateChunk(pos.chunk.x, pos.chunk.y, Direction.DOWN);
-      if (pos.tile.x <= 1 + loadsens) { //left
+      if (pos.tile.x <= loadsens) { //left
         Game.world.generateChunk(pos.chunk.x, pos.chunk.y - 1, Direction.LEFT);
       }
       if (pos.tile.x >= (Chunk.tilesperside - 1 - loadsens)) { //right
@@ -63,7 +63,7 @@ export class Game {
     }
     if (pos.tile.y >= (Chunk.tilesperside - 1 - loadsens)) { //top
       Game.world.generateChunk(pos.chunk.x, pos.chunk.y, Direction.UP);
-      if (pos.tile.x <= 1 + loadsens) { //left
+      if (pos.tile.x <= loadsens) { //left
         Game.world.generateChunk(pos.chunk.x, pos.chunk.y + 1, Direction.LEFT);
       }
       if (pos.tile.x >= (Chunk.tilesperside - 1 - loadsens)) { //right

@@ -16,15 +16,8 @@ var world_1 = require("./world");
 var world_2 = require("./world");
 var Character = (function () {
     function Character(id, name) {
-        this.position = {
-            world: { x: 0, y: 0 },
-            chunk: { x: 0, y: 0 },
-            tile: { x: 0, y: 0 },
-            screen: { x: 0, y: 0 }
-        };
         this.id = id;
         this.name = name;
-        this.draw(canvas_1.Canvas.center.x, canvas_1.Canvas.center.y);
     }
     Character.prototype.draw = function (x, y) { };
     ;
@@ -32,9 +25,17 @@ var Character = (function () {
 }());
 var Player = (function (_super) {
     __extends(Player, _super);
-    function Player() {
-        var _this = _super !== null && _super.apply(this, arguments) || this;
+    function Player(id, name) {
+        var _this = _super.call(this, id, name) || this;
         _this.moving = false;
+        _this.position = {
+            world: { x: 0, y: 0 },
+            chunk: { x: 0, y: 0 },
+            tile: { x: Math.floor(world_1.Chunk.tilesperside / 2), y: Math.floor(world_1.Chunk.tilesperside / 2) },
+            screen: { x: 0, y: 0 }
+        };
+        console.log(_this.position);
+        _this.draw(canvas_1.Canvas.center.x, canvas_1.Canvas.center.y);
         return _this;
     }
     Player.prototype.draw = function (x, y) {
