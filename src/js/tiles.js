@@ -1,3 +1,7 @@
+//to do:
+//humidity
+//temperature
+//etc
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = Object.setPrototypeOf ||
@@ -18,12 +22,13 @@ var Tile = (function () {
     }
     //randomly pick a texture for the tile (or if only 1 then that one)
     Tile.prototype.setTexture = function (src) {
-        var rng = Math.floor(Math.random() * (src.length - 1));
+        var rng = Math.floor(Math.random() * src.length);
+        console.log(rng);
         this.texture.src = src[rng];
     };
     return Tile;
 }());
-Tile.tilesize = 50;
+Tile.tilesize = 40;
 exports.Tile = Tile;
 var Grass = (function (_super) {
     __extends(Grass, _super);
@@ -36,8 +41,7 @@ var Grass = (function (_super) {
 }(Tile));
 Grass.id = 1;
 Grass.textures = [
-    "src/img/grass.png",
-    "src/img/grass_1.png",
-    "src/img/grass_2.png"
+    "src/img/grass_3.png",
+    "src/img/grass_4.png"
 ];
 exports.Grass = Grass;

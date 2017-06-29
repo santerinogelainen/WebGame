@@ -158,11 +158,13 @@ var World = (function () {
             var tilepositionx = chunkpositionx + (tiles_1.Tile.tilesize * tile.x) - (tiles_1.Tile.tilesize / 2);
             var tilepositiony = chunkpositiony + (tiles_1.Tile.tilesize * tile.y) - (tiles_1.Tile.tilesize / 2);
             canvas_1.Canvas.context.beginPath();
-            canvas_1.Canvas.context.drawImage(tile.texture, tilepositionx, tilepositiony, tiles_1.Tile.tilesize, tiles_1.Tile.tilesize);
             if (debug_1.Debug.lines) {
                 canvas_1.Canvas.context.rect(tilepositionx, tilepositiony, tiles_1.Tile.tilesize, tiles_1.Tile.tilesize);
                 canvas_1.Canvas.context.strokeStyle = "rgba(255, 255, 255, 0.5)";
                 canvas_1.Canvas.context.stroke();
+            }
+            else {
+                canvas_1.Canvas.context.drawImage(tile.texture, tilepositionx, tilepositiony, tiles_1.Tile.tilesize, tiles_1.Tile.tilesize);
             }
             i++;
         }

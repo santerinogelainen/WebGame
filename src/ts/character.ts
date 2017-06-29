@@ -21,7 +21,7 @@ class Character {
 
 export class Player extends Character {
 
-  static size:number = 25;
+  static size:number = 20;
   static speed:number = 3;
   moving: boolean = false;
   position: any ={

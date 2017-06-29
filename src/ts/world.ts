@@ -172,11 +172,12 @@ export class World {
       let tilepositionx:number = chunkpositionx + (Tile.tilesize * tile.x) - (Tile.tilesize / 2);
       let tilepositiony:number = chunkpositiony + (Tile.tilesize * tile.y) - (Tile.tilesize / 2);
       Canvas.context.beginPath();
-      Canvas.context.drawImage(tile.texture, tilepositionx, tilepositiony, Tile.tilesize, Tile.tilesize);
       if (Debug.lines) {
         Canvas.context.rect(tilepositionx, tilepositiony, Tile.tilesize, Tile.tilesize);
         Canvas.context.strokeStyle = "rgba(255, 255, 255, 0.5)";
         Canvas.context.stroke();
+      } else {
+        Canvas.context.drawImage(tile.texture, tilepositionx, tilepositiony, Tile.tilesize, Tile.tilesize);
       }
       i++;
     }

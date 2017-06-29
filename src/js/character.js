@@ -87,6 +87,6 @@ var Player = (function (_super) {
     };
     return Player;
 }(Character));
-Player.size = 25;
+Player.size = 20;
 Player.speed = 3;
 exports.Player = Player;
