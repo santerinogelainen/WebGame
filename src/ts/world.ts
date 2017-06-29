@@ -19,7 +19,7 @@ export class Chunk {
   tiles: Array<Tile> = [];
   static tilesperside:number = 7; //USE ONLY NUMBERS WHERE % 2 = 1;
   static chunksize:number = Chunk.tilesperside * Tile.tilesize;
-  static loadsensitivity:number = 1;
+  static loadsensitivity:number = 2;
   static perscreen:any = {x: 0, y: 0};
   x: number;
   y: number;
@@ -75,7 +75,6 @@ export class World {
 
   loadChunk(x: number, y:number) {
     if (this.chunkExists(x, y)) {
-      console.log(this.onscreen.indexOf(World.coordinatesToString(x, y)));
       if (this.onscreen.indexOf(World.coordinatesToString(x, y)) == -1) {
         this.onscreen.push(World.coordinatesToString(x, y));
       }
@@ -92,55 +91,46 @@ export class World {
   //load a bunch of chunks
   loadChunksOnWalk(pos: Position, dir: Direction, playerposx: number, playerposy: number) {
     let indextop, indexbottom, x, y, unloadx, unloady;
+    let halfy:number = Math.ceil(Chunk.perscreen.y / 2) + 1;
+    let halfx:number = Math.ceil(Chunk.perscreen.x / 2) + 1;
     //might seem a bit backwards mut if we move on the x axis
     //we want to loop through on the y axis
     if (pos == Position.X) {
-      indextop = playerposy + Math.ceil(Chunk.perscreen.y / 2);
-      indexbottom = playerposy - Math.ceil(Chunk.perscreen.y / 2);
+      indextop = playerposy + halfy;
+      indexbottom = playerposy - halfy;
     } else if (pos == Position.Y) {
-      indextop = playerposx + Math.ceil(Chunk.perscreen.x / 2);
-      indexbottom = playerposx - Math.ceil(Chunk.perscreen.x / 2);
+      indextop = playerposx + halfx;
+      indexbottom = playerposx - halfy;
     }
     while (indextop >= indexbottom) {
       if (pos == Position.X) {
+        y = indextop;
+        unloady = indextop;
         if (dir == Direction.RIGHT) {
-          x = playerposx + Math.ceil(Chunk.perscreen.x / 2) + 1;
-          y = indextop;
-          unloadx = playerposx - Math.ceil(Chunk.perscreen.x / 2) - 2;
-          unloady = indextop;
+          x = playerposx + halfx;
+          unloadx = playerposx - halfx - 1;
         }
         if (dir == Direction.LEFT) {
-          x = playerposx - Math.ceil(Chunk.perscreen.x / 2) - 1;
-          y = indextop;
-          unloadx = playerposx + Math.ceil(Chunk.perscreen.x / 2) + 2;
-          unloady = indextop;
+          x = playerposx - halfx;
+          unloadx = playerposx + halfx + 1;
         }
       }
       if (pos == Position.Y) {
+        x = indextop;
+        unloadx = indextop;
         if (dir == Direction.UP) {
-          x = indextop;
-          y = playerposy + Math.ceil(Chunk.perscreen.y / 2) + 1;
-          unloadx = indextop;
-          unloady = playerposy - Math.ceil(Chunk.perscreen.y / 2) - 2;
+          y = playerposy + halfy;
+          unloady = playerposy - halfy - 1;
         }
         if (dir == Direction.DOWN) {
-          x = indextop;
-          y = playerposy - Math.ceil(Chunk.perscreen.y / 2) - 1;
-          unloadx = indextop;
-          unloady = playerposy + Math.ceil(Chunk.perscreen.y / 2) + 2;
+          y = playerposy - halfy;
+          unloady = playerposy + halfy + 1;
         }
       }
-      console.log("x: " + x);
-      console.log("y: " + y);
-      console.log("unloadx" + unloadx);
-      console.log("unloady" + unloady);
-      console.log("------");
       this.unloadChunk(unloadx, unloady);
       this.loadChunk(x, y);
       indextop--;
     }
-    console.log(this.onscreen);
-    console.log("--------------------------------------------------------------");
   }
 
   generateChunk(x:number, y:number, direction?:number): void {

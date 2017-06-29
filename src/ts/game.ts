@@ -46,23 +46,36 @@ export class Game {
   static checkPlayerPosition() {
     let pos = Game.player.position;
     let loadsens = Chunk.loadsensitivity;
-    if (pos.tile.x == 0 + loadsens) {
+    if (pos.tile.x <= 1 + loadsens) { //left
       Game.world.generateChunk(pos.chunk.x, pos.chunk.y, Direction.LEFT);
     }
-    if (pos.tile.x == (Chunk.tilesperside - 1 - loadsens)) {
+    if (pos.tile.x >= (Chunk.tilesperside - 1 - loadsens)) { //right
       Game.world.generateChunk(pos.chunk.x, pos.chunk.y, Direction.RIGHT);
     }
-    if (pos.tile.y == 0 + loadsens) {
+    if (pos.tile.y <= 1 + loadsens) { //bottom
       Game.world.generateChunk(pos.chunk.x, pos.chunk.y, Direction.DOWN);
+      if (pos.tile.x <= 1 + loadsens) { //left
+        Game.world.generateChunk(pos.chunk.x, pos.chunk.y - 1, Direction.LEFT);
+      }
+      if (pos.tile.x >= (Chunk.tilesperside - 1 - loadsens)) { //right
+        Game.world.generateChunk(pos.chunk.x, pos.chunk.y - 1, Direction.RIGHT);
+      }
     }
-    if (pos.tile.y == (Chunk.tilesperside - 1 - loadsens)) {
+    if (pos.tile.y >= (Chunk.tilesperside - 1 - loadsens)) { //top
       Game.world.generateChunk(pos.chunk.x, pos.chunk.y, Direction.UP);
+      if (pos.tile.x <= 1 + loadsens) { //left
+        Game.world.generateChunk(pos.chunk.x, pos.chunk.y + 1, Direction.LEFT);
+      }
+      if (pos.tile.x >= (Chunk.tilesperside - 1 - loadsens)) { //right
+        Game.world.generateChunk(pos.chunk.x, pos.chunk.y + 1, Direction.RIGHT);
+      }
     }
     Game.world.generateChunk(pos.chunk.x, pos.chunk.y);
   }
 
   static getDebugLines(): Array<string> {
     let debugLines:Array<string> = [
+      "Loaded chunks: " + Game.world.onscreen.join(", "),
       "Fixed position: x=" + Game.player.position.screen.x + " y=" + Game.player.position.screen.y,
       "World position: x=" + Game.player.position.world.x + " y=" + Game.player.position.world.y,
       "Chunk position: x=" + Game.player.position.chunk.x + " y=" + Game.player.position.chunk.y,

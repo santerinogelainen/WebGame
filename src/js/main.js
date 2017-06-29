@@ -10,12 +10,6 @@ window.onload = function () {
     canvas_1.Canvas.setBackground(new general_1.Color(0, 0, 0, 1));
     game_1.Game.start();
     window.requestAnimationFrame(game_1.Game.loop);
-    //generate additional chunks
-    /*Game.world.generateChunk(0, 0, Direction.UP);
-    Game.world.generateChunk(0, 1, Direction.LEFT);
-    Game.world.generateChunk(-1, 1, Direction.DOWN);
-    Game.world.generateChunk(0, 1, Direction.RIGHT);*/
-    //Game.world.generateChunk(0, 0, Direction.RIGHT);
     window.addEventListener("keydown", debug_1.Debug.toggle, false);
     window.addEventListener("keydown", game_1.Game.keypress, false);
     window.addEventListener("keyup", game_1.Game.keypress, false);
