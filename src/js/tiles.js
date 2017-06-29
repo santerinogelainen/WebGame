@@ -16,8 +16,10 @@ var Tile = (function () {
         this.x = x;
         this.y = y;
     }
+    //randomly pick a texture for the tile (or if only 1 then that one)
     Tile.prototype.setTexture = function (src) {
-        this.texture.src = src;
+        var rng = Math.floor(Math.random() * (src.length - 1));
+        this.texture.src = src[rng];
     };
     return Tile;
 }());
@@ -27,10 +29,15 @@ var Grass = (function (_super) {
     __extends(Grass, _super);
     function Grass(x, y) {
         var _this = _super.call(this, x, y) || this;
-        _this.setTexture("src/img/grass.png");
+        _this.setTexture(Grass.textures);
         return _this;
     }
     return Grass;
 }(Tile));
 Grass.id = 1;
+Grass.textures = [
+    "src/img/grass.png",
+    "src/img/grass_1.png",
+    "src/img/grass_2.png"
+];
 exports.Grass = Grass;
