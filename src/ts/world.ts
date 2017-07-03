@@ -59,13 +59,12 @@ export class Chunk {
     let x = tilex + (this.x * Chunk.tilesperside);
     let y = tiley + (this.y * Chunk.tilesperside);
     let biome = noise.perlin2(x / Biome.intensity, y / Biome.intensity) * 100;
-    return Math.round(biome);
+    return Math.abs(Math.round(biome));
   }
 
   getTileBiome(noise: number) {
     for (let biome of Biome.biomes) {
       if (noise <= biome.max && noise >= biome.min) {
-        console.log(biome);
         return biome;
       }
     }
@@ -151,7 +150,6 @@ export class World {
     let coords = this.calculateDirection(x, y, direction);
     if (!this.chunkExists(coords.x, coords.y)) {
       let chunk = new Chunk(coords.x, coords.y);
-      console.log(chunk);
       this.drawChunk(chunk);
       this.chunks[World.coordinatesToString(coords.x, coords.y)] = chunk;
       this.loadChunk(coords.x, coords.y);

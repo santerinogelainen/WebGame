@@ -47,13 +47,12 @@ var Chunk = (function () {
         var x = tilex + (this.x * Chunk.tilesperside);
         var y = tiley + (this.y * Chunk.tilesperside);
         var biome = noise.perlin2(x / biomes_1.Biome.intensity, y / biomes_1.Biome.intensity) * 100;
-        return Math.round(biome);
+        return Math.abs(Math.round(biome));
     };
     Chunk.prototype.getTileBiome = function (noise) {
         for (var _i = 0, _a = biomes_1.Biome.biomes; _i < _a.length; _i++) {
             var biome = _a[_i];
             if (noise <= biome.max && noise >= biome.min) {
-                console.log(biome);
                 return biome;
             }
         }
@@ -135,7 +134,6 @@ var World = (function () {
         var coords = this.calculateDirection(x, y, direction);
         if (!this.chunkExists(coords.x, coords.y)) {
             var chunk = new Chunk(coords.x, coords.y);
-            console.log(chunk);
             this.drawChunk(chunk);
             this.chunks[World.coordinatesToString(coords.x, coords.y)] = chunk;
             this.loadChunk(coords.x, coords.y);

@@ -14,10 +14,10 @@ class BiomeTemplate {
 }
 
 class Planes extends BiomeTemplate {
-  static biomename: "Planes";
-  static id: number = 1;
-  min: number = -10;
-  max: number = 10;
+  static biomename = "Planes";
+  static id = 1;
+  min = 0;
+  max = 15;
 
   constructor() {
     super();
@@ -29,10 +29,10 @@ class Planes extends BiomeTemplate {
 }
 
 class Sea extends BiomeTemplate {
-  static biomename: "Sea";
-  static id: number = 2;
-  min: number = 11;
-  max: number = 40;
+  static biomename = "Sea";
+  static id = 2;
+  min = 16;
+  max = 30;
 
   constructor() {
     super();
@@ -43,9 +43,25 @@ class Sea extends BiomeTemplate {
   }
 }
 
+class Desert extends BiomeTemplate {
+  static biomename = "Desert";
+  static id = 3;
+  min = 31;
+  max = 45;
+
+  constructor() {
+    super();
+  }
+
+  getTile(x: number, y:number, noise: number) {
+    return new tiles.Sand(x, y, noise);
+  }
+}
+
 export class Biome {
   static intensity: number = 300;
   static planes = new Planes();
   static sea = new Sea();
-  static biomes = [Biome.planes, Biome.sea];
+  static desert = new Desert();
+  static biomes = [Biome.planes, Biome.sea, Biome.desert];
 }

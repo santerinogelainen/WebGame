@@ -30,28 +30,45 @@ var Grass = (function (_super) {
     __extends(Grass, _super);
     function Grass(x, y, noise) {
         var _this = _super.call(this, x, y, noise) || this;
-        _this.setTexture(Grass.textures);
+        _this.textures = [
+            "src/img/grass_3.png",
+            "src/img/grass_4.png"
+        ];
+        _this.setTexture(_this.textures);
         return _this;
     }
     return Grass;
 }(Tile));
 Grass.id = 1;
-Grass.textures = [
-    "src/img/grass_3.png",
-    "src/img/grass_4.png"
-];
 exports.Grass = Grass;
 var Water = (function (_super) {
     __extends(Water, _super);
     function Water(x, y, noise) {
         var _this = _super.call(this, x, y, noise) || this;
-        _this.setTexture(Water.textures);
+        _this.textures = [
+            "src/img/water.png",
+            "src/img/water_1.png"
+        ];
+        _this.setTexture(_this.textures);
         return _this;
     }
     return Water;
 }(Tile));
 Water.id = 2;
-Water.textures = [
-    "src/img/water.png"
-];
 exports.Water = Water;
+var Sand = (function (_super) {
+    __extends(Sand, _super);
+    function Sand(x, y, noise) {
+        var _this = _super.call(this, x, y, noise) || this;
+        _this.textures = [
+            "src/img/sand.png",
+            "src/img/sand_1.png",
+            "src/img/sand_2.png"
+        ];
+        _this.setTexture(_this.textures);
+        return _this;
+    }
+    return Sand;
+}(Tile));
+Sand.id = 3;
+exports.Sand = Sand;

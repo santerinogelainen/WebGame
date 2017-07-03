@@ -26,23 +26,37 @@ export class Tile {
 
 export class Grass extends Tile {
   static id:number = 1;
-  static textures: Array<string> = [
+  textures: Array<string> = [
     "src/img/grass_3.png",
     "src/img/grass_4.png"
   ];
   constructor(x:number, y:number, noise: number) {
     super(x, y, noise);
-    this.setTexture(Grass.textures);
+    this.setTexture(this.textures);
   }
 }
 
 export class Water extends Tile {
   static id:number = 2;
-  static textures: Array<string> = [
-    "src/img/water.png"
+  textures: Array<string> = [
+    "src/img/water.png",
+    "src/img/water_1.png"
   ];
   constructor(x:number, y:number, noise: number) {
     super(x, y, noise);
-    this.setTexture(Water.textures);
+    this.setTexture(this.textures);
+  }
+}
+
+export class Sand extends Tile {
+  static id:number = 3;
+  textures: Array<string> = [
+    "src/img/sand.png",
+    "src/img/sand_1.png",
+    "src/img/sand_2.png"
+  ];
+  constructor(x:number, y:number, noise: number) {
+    super(x, y, noise);
+    this.setTexture(this.textures);
   }
 }
