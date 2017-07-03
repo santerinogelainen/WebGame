@@ -1,13 +1,26 @@
 
 import * as tiles from "./tiles";
 
-class Planes {
-  id: number = 1;
+class BiomeTemplate {
+  //every biome has a name, id, min noise and max noise
+  static biomename: string;
+  static id: number;
+  min: number;
+  max: number;
+
+  //each biome has it's own implementation of getTile
+  //this function returns a new Tile of the biomes type
+  getTile(x: number, y:number, noise:number){};
+}
+
+class Planes extends BiomeTemplate {
+  static biomename: "Planes";
+  static id: number = 1;
   min: number = -10;
   max: number = 10;
 
   constructor() {
-
+    super();
   }
 
   getTile(x: number, y: number, noise: number) {
@@ -15,13 +28,14 @@ class Planes {
   }
 }
 
-class Sea {
-  id: number = 2;
+class Sea extends BiomeTemplate {
+  static biomename: "Sea";
+  static id: number = 2;
   min: number = 11;
   max: number = 40;
 
   constructor() {
-
+    super();
   }
 
   getTile(x: number, y:number, noise: number) {
