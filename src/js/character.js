@@ -31,7 +31,7 @@ var Player = (function (_super) {
         _this.position = {
             world: { x: 0, y: 0 },
             chunk: { x: 0, y: 0 },
-            tile: { x: Math.floor(world_1.Chunk.tilesperside / 2), y: Math.floor(world_1.Chunk.tilesperside / 2) },
+            tile: { x: Math.ceil(world_1.Chunk.tilesperside / 2), y: Math.ceil(world_1.Chunk.tilesperside / 2) },
             screen: { x: 0, y: 0 }
         };
         _this.draw(canvas_1.Canvas.center.x, canvas_1.Canvas.center.y);
@@ -49,11 +49,11 @@ var Player = (function (_super) {
         switch (position) {
             case general_1.Position.X:
                 this.position.chunk.x = Math.round(this.position.world.x / world_1.Chunk.chunksize);
-                this.position.tile.x = Math.round(world_1.Chunk.tilesperside / 2) + Math.round((this.position.world.x / tiles_1.Tile.tilesize)) - (this.position.chunk.x * world_1.Chunk.tilesperside) - 1;
+                this.position.tile.x = Math.round(world_1.Chunk.tilesperside / 2) + Math.round((this.position.world.x / tiles_1.Tile.tilesize)) - (this.position.chunk.x * world_1.Chunk.tilesperside);
                 break;
             case general_1.Position.Y:
                 this.position.chunk.y = Math.round(this.position.world.y / world_1.Chunk.chunksize);
-                this.position.tile.y = Math.round(world_1.Chunk.tilesperside / 2) + Math.round((this.position.world.y / tiles_1.Tile.tilesize)) - (this.position.chunk.y * world_1.Chunk.tilesperside) - 1;
+                this.position.tile.y = Math.round(world_1.Chunk.tilesperside / 2) + Math.round((this.position.world.y / tiles_1.Tile.tilesize)) - (this.position.chunk.y * world_1.Chunk.tilesperside);
                 break;
             default:
                 console.log("Error: unknown position " + position);

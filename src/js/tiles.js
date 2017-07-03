@@ -1,7 +1,3 @@
-//to do:
-//humidity
-//temperature
-//etc
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = Object.setPrototypeOf ||
@@ -15,15 +11,15 @@ var __extends = (this && this.__extends) || (function () {
 })();
 exports.__esModule = true;
 var Tile = (function () {
-    function Tile(x, y) {
+    function Tile(x, y, noise) {
         this.texture = new Image();
+        this.noise = noise;
         this.x = x;
         this.y = y;
     }
     //randomly pick a texture for the tile (or if only 1 then that one)
     Tile.prototype.setTexture = function (src) {
         var rng = Math.floor(Math.random() * src.length);
-        console.log(rng);
         this.texture.src = src[rng];
     };
     return Tile;
@@ -32,8 +28,8 @@ Tile.tilesize = 40;
 exports.Tile = Tile;
 var Grass = (function (_super) {
     __extends(Grass, _super);
-    function Grass(x, y) {
-        var _this = _super.call(this, x, y) || this;
+    function Grass(x, y, noise) {
+        var _this = _super.call(this, x, y, noise) || this;
         _this.setTexture(Grass.textures);
         return _this;
     }
@@ -45,3 +41,17 @@ Grass.textures = [
     "src/img/grass_4.png"
 ];
 exports.Grass = Grass;
+var Water = (function (_super) {
+    __extends(Water, _super);
+    function Water(x, y, noise) {
+        var _this = _super.call(this, x, y, noise) || this;
+        _this.setTexture(Water.textures);
+        return _this;
+    }
+    return Water;
+}(Tile));
+Water.id = 2;
+Water.textures = [
+    "src/img/water.png"
+];
+exports.Water = Water;

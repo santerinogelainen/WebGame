@@ -5,6 +5,7 @@ export class Debug {
 
   static on:boolean = false;
   static lines:boolean = false;
+  static worldtext:boolean = false;
   static lineHeight:number = 15;
 
   static draw(lines: Array<string>) {
@@ -34,6 +35,14 @@ export class Debug {
         Debug.lines = false;
       } else {
         Debug.lines = true;
+      }
+    }
+    if (e.keyCode === 113) {
+      e.preventDefault();
+      if (Debug.worldtext == true) {
+        Debug.worldtext = false;
+      } else {
+        Debug.worldtext = true;
       }
     }
   }

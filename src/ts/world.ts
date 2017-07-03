@@ -4,6 +4,8 @@ import { Position } from "./general";
 import { Tile } from "./tiles";
 import { Grass } from "./tiles";
 import { Debug } from "./debug";
+import { Biome } from "./biomes";
+declare var noise;
 
 export class Chunk {
 
@@ -15,10 +17,10 @@ export class Chunk {
   x: number;
   y: number;
 
-  constructor(seed:number, x:number, y: number) {
+  constructor(x:number, y: number) {
     this.x = x;
     this.y = y;
-    this.generateTiles(seed);
+    this.generateTiles();
   }
 
   static isOnScreen(chunk: Chunk, playerx: number, playery: number): boolean {
@@ -38,19 +40,40 @@ export class Chunk {
     Chunk.perscreen.y = Math.ceil(Canvas.height / Chunk.chunksize);
   }
 
-  generateTiles(seed:number): void {
-    let r:number = 0, c:number = 0;
-    while (r < Chunk.tilesperside) {
-      while (c < Chunk.tilesperside) {
-        let tile: Grass = new Grass(r, c);
+  generateTiles(): void {
+    let r:number = 1;
+    while (r <= Chunk.tilesperside) {
+      let c = 1;
+      while (c <= Chunk.tilesperside) {
+        let noise = this.generateTileNoise(r, c);
+        let biome = this.getTileBiome(noise);
+        let tile = biome.getTile(r, c, noise);
         this.tiles.push(tile);
         c++;
       }
-      c = 0;
       r++;
     }
   }
+
+  generateTileNoise(tilex: number, tiley: number) {
+    let x = tilex + (this.x * Chunk.tilesperside);
+    let y = tiley + (this.y * Chunk.tilesperside);
+    let biome = noise.perlin2(x / Biome.intensity, y / Biome.intensity) * 100;
+    return Math.round(biome);
+  }
+
+  getTileBiome(noise: number) {
+    for (let biome of Biome.biomes) {
+      if (noise <= biome.max && noise >= biome.min) {
+        console.log(biome);
+        return biome;
+      }
+    }
+  }
 }
+
+
+
 
 export class World {
 
@@ -60,8 +83,8 @@ export class World {
 
   constructor() {
     Chunk.calculatePerScreenRatio();
-    this.seed = this.generateSeed(-2147483647, 2147483647);
-    this.generateChunk(0, 0, null);
+    this.generateSeed();
+    this.generateChunk(0, 0);
   }
 
   loadChunk(x: number, y:number) {
@@ -127,7 +150,8 @@ export class World {
   generateChunk(x:number, y:number, direction?:number): void {
     let coords = this.calculateDirection(x, y, direction);
     if (!this.chunkExists(coords.x, coords.y)) {
-      let chunk = new Chunk(this.seed, coords.x, coords.y);
+      let chunk = new Chunk(coords.x, coords.y);
+      console.log(chunk);
       this.drawChunk(chunk);
       this.chunks[World.coordinatesToString(coords.x, coords.y)] = chunk;
       this.loadChunk(coords.x, coords.y);
@@ -167,10 +191,9 @@ export class World {
   drawChunk(chunk: Chunk) {
     let chunkpositionx:number = Canvas.center.x + (Chunk.chunksize * chunk.x) - (Chunk.chunksize / 2);
     let chunkpositiony:number = Canvas.center.y + (Chunk.chunksize * -chunk.y) - (Chunk.chunksize / 2);
-    let i = 0;
     for (let tile of chunk.tiles) {
-      let tilepositionx:number = chunkpositionx + (Tile.tilesize * tile.x) - (Tile.tilesize / 2);
-      let tilepositiony:number = chunkpositiony + (Tile.tilesize * tile.y) - (Tile.tilesize / 2);
+      let tilepositionx:number = chunkpositionx + (Tile.tilesize * (tile.x - 1)) - (Tile.tilesize / 2);
+      let tilepositiony:number = chunkpositiony + (Tile.tilesize * -(tile.y)) - (Tile.tilesize / 2) + Chunk.chunksize;
       Canvas.context.beginPath();
       if (Debug.lines) {
         Canvas.context.rect(tilepositionx, tilepositiony, Tile.tilesize, Tile.tilesize);
@@ -179,7 +202,19 @@ export class World {
       } else {
         Canvas.context.drawImage(tile.texture, tilepositionx, tilepositiony, Tile.tilesize, Tile.tilesize);
       }
-      i++;
+      if (Debug.worldtext) {
+        Canvas.context.font = "10px sans-serif";
+        Canvas.context.fillStyle = "rgba(255, 255, 255, 0.5)";
+        Canvas.context.fillText("n:" + tile.noise, tilepositionx + 5, tilepositiony + 12);
+        Canvas.context.fillText("" + tile.x + ", " + tile.y, tilepositionx + 5, tilepositiony + 22);
+        Canvas.context.fillText("" + (tile.x + (chunk.x * Chunk.tilesperside)) + ", " + (tile.y + (chunk.y * Chunk.tilesperside)), tilepositionx + 5, tilepositiony + 32);
+      }
+    }
+    if (Debug.worldtext) {
+      Canvas.context.beginPath();
+      Canvas.context.font = "15px sans-serif";
+      Canvas.context.fillStyle = "red";
+      Canvas.context.fillText("" + chunk.x + ", " + chunk.y, chunkpositionx - (Tile.tilesize / 2) + 5, chunkpositiony - (Tile.tilesize / 2) + 20);
     }
     if (Debug.lines) {
       Canvas.context.beginPath();
@@ -189,7 +224,8 @@ export class World {
     }
   }
 
-  generateSeed(min: number, max: number): number {
-    return Math.floor(Math.random() * (max-min+1)+min);
+  generateSeed(): void {
+    this.seed = Math.random();
+    noise.seed(this.seed);
   }
 }

@@ -49,7 +49,7 @@ export class Game {
     if (pos.tile.x <= loadsens) { //left
       Game.world.generateChunk(pos.chunk.x, pos.chunk.y, Direction.LEFT);
     }
-    if (pos.tile.x >= (Chunk.tilesperside - 1 - loadsens)) { //right
+    if (pos.tile.x >= (Chunk.tilesperside - loadsens + 1)) { //right
       Game.world.generateChunk(pos.chunk.x, pos.chunk.y, Direction.RIGHT);
     }
     if (pos.tile.y <= loadsens) { //bottom
@@ -57,16 +57,16 @@ export class Game {
       if (pos.tile.x <= loadsens) { //left
         Game.world.generateChunk(pos.chunk.x, pos.chunk.y - 1, Direction.LEFT);
       }
-      if (pos.tile.x >= (Chunk.tilesperside - 1 - loadsens)) { //right
+      if (pos.tile.x >= (Chunk.tilesperside - loadsens)) { //right
         Game.world.generateChunk(pos.chunk.x, pos.chunk.y - 1, Direction.RIGHT);
       }
     }
-    if (pos.tile.y >= (Chunk.tilesperside - 1 - loadsens)) { //top
+    if (pos.tile.y >= (Chunk.tilesperside - loadsens + 1)) { //top
       Game.world.generateChunk(pos.chunk.x, pos.chunk.y, Direction.UP);
       if (pos.tile.x <= loadsens) { //left
         Game.world.generateChunk(pos.chunk.x, pos.chunk.y + 1, Direction.LEFT);
       }
-      if (pos.tile.x >= (Chunk.tilesperside - 1 - loadsens)) { //right
+      if (pos.tile.x >= (Chunk.tilesperside - loadsens + 1)) { //right
         Game.world.generateChunk(pos.chunk.x, pos.chunk.y + 1, Direction.RIGHT);
       }
     }

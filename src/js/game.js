@@ -47,7 +47,7 @@ var Game = (function () {
         if (pos.tile.x <= loadsens) {
             Game.world.generateChunk(pos.chunk.x, pos.chunk.y, general_1.Direction.LEFT);
         }
-        if (pos.tile.x >= (world_2.Chunk.tilesperside - 1 - loadsens)) {
+        if (pos.tile.x >= (world_2.Chunk.tilesperside - loadsens + 1)) {
             Game.world.generateChunk(pos.chunk.x, pos.chunk.y, general_1.Direction.RIGHT);
         }
         if (pos.tile.y <= loadsens) {
@@ -55,16 +55,16 @@ var Game = (function () {
             if (pos.tile.x <= loadsens) {
                 Game.world.generateChunk(pos.chunk.x, pos.chunk.y - 1, general_1.Direction.LEFT);
             }
-            if (pos.tile.x >= (world_2.Chunk.tilesperside - 1 - loadsens)) {
+            if (pos.tile.x >= (world_2.Chunk.tilesperside - loadsens)) {
                 Game.world.generateChunk(pos.chunk.x, pos.chunk.y - 1, general_1.Direction.RIGHT);
             }
         }
-        if (pos.tile.y >= (world_2.Chunk.tilesperside - 1 - loadsens)) {
+        if (pos.tile.y >= (world_2.Chunk.tilesperside - loadsens + 1)) {
             Game.world.generateChunk(pos.chunk.x, pos.chunk.y, general_1.Direction.UP);
             if (pos.tile.x <= loadsens) {
                 Game.world.generateChunk(pos.chunk.x, pos.chunk.y + 1, general_1.Direction.LEFT);
             }
-            if (pos.tile.x >= (world_2.Chunk.tilesperside - 1 - loadsens)) {
+            if (pos.tile.x >= (world_2.Chunk.tilesperside - loadsens + 1)) {
                 Game.world.generateChunk(pos.chunk.x, pos.chunk.y + 1, general_1.Direction.RIGHT);
             }
         }

@@ -35,10 +35,20 @@ var Debug = (function () {
                 Debug.lines = true;
             }
         }
+        if (e.keyCode === 113) {
+            e.preventDefault();
+            if (Debug.worldtext == true) {
+                Debug.worldtext = false;
+            }
+            else {
+                Debug.worldtext = true;
+            }
+        }
     };
     return Debug;
 }());
 Debug.on = false;
 Debug.lines = false;
+Debug.worldtext = false;
 Debug.lineHeight = 15;
 exports.Debug = Debug;

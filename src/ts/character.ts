@@ -27,7 +27,7 @@ export class Player extends Character {
   position: any ={
     world: {x: 0, y: 0},
     chunk: {x: 0, y: 0},
-    tile: {x: Math.floor(Chunk.tilesperside / 2), y: Math.floor(Chunk.tilesperside / 2)},
+    tile: {x: Math.ceil(Chunk.tilesperside / 2), y: Math.ceil(Chunk.tilesperside / 2)},
     screen: {x: 0, y: 0}
   };
 
@@ -49,11 +49,11 @@ export class Player extends Character {
     switch(position) {
       case Pos.X:
         this.position.chunk.x = Math.round(this.position.world.x / Chunk.chunksize);
-        this.position.tile.x = Math.round(Chunk.tilesperside / 2) + Math.round((this.position.world.x / Tile.tilesize)) - (this.position.chunk.x * Chunk.tilesperside) - 1;
+        this.position.tile.x = Math.round(Chunk.tilesperside / 2) + Math.round((this.position.world.x / Tile.tilesize)) - (this.position.chunk.x * Chunk.tilesperside);
         break;
       case Pos.Y:
         this.position.chunk.y = Math.round(this.position.world.y / Chunk.chunksize);
-        this.position.tile.y = Math.round(Chunk.tilesperside / 2) + Math.round((this.position.world.y / Tile.tilesize)) - (this.position.chunk.y * Chunk.tilesperside) - 1;
+        this.position.tile.y = Math.round(Chunk.tilesperside / 2) + Math.round((this.position.world.y / Tile.tilesize)) - (this.position.chunk.y * Chunk.tilesperside);
         break;
       default:
         console.log("Error: unknown position " + position);
