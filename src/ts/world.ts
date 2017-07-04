@@ -17,10 +17,10 @@ export class Chunk {
   x: number;
   y: number;
 
-  constructor(x:number, y: number) {
+  constructor(x:number, y: number, seeds) {
     this.x = x;
     this.y = y;
-    this.generateTiles();
+    this.generateTiles(seeds);
   }
 
   static isOnScreen(chunk: Chunk, playerx: number, playery: number): boolean {
@@ -40,14 +40,15 @@ export class Chunk {
     Chunk.perscreen.y = Math.ceil(Canvas.height / Chunk.chunksize);
   }
 
-  generateTiles(): void {
+  generateTiles(seeds): void {
     let r:number = 1;
     while (r <= Chunk.tilesperside) {
       let c = 1;
       while (c <= Chunk.tilesperside) {
-        let noise = this.generateTileNoise(r, c);
-        let biome = this.getTileBiome(noise);
-        let tile = biome.getTile(r, c, noise);
+        let noise = this.generateTileNoise(r, c, seeds);
+        console.log(noise);
+        let biome = this.getTileBiome(noise[0], noise[1]);
+        let tile = biome.getTile(r, c, noise[0], noise[1]);
         this.tiles.push(tile);
         c++;
       }
@@ -55,16 +56,19 @@ export class Chunk {
     }
   }
 
-  generateTileNoise(tilex: number, tiley: number) {
+  generateTileNoise(tilex: number, tiley: number, seeds) {
     let x = tilex + (this.x * Chunk.tilesperside);
     let y = tiley + (this.y * Chunk.tilesperside);
-    let biome = noise.perlin2(x / Biome.intensity, y / Biome.intensity) * 100;
-    return Math.abs(Math.round(biome));
+    noise.seed(seeds.hum);
+    let humidity = noise.simplex2(x / Biome.intensity, y / Biome.intensity) * Biome.maxhum;
+    noise.seed(seeds.temp);
+    let temperature = noise.simplex2(x / Biome.intensity, y / Biome.intensity) * Biome.maxtemp;
+    return [Math.abs(Math.round(humidity)), Math.abs(Math.round(temperature))];
   }
 
-  getTileBiome(noise: number) {
+  getTileBiome(hum: number, temp: number) {
     for (let biome of Biome.biomes) {
-      if (noise <= biome.max && noise >= biome.min) {
+      if (hum <= biome.humidity.max && hum >= biome.humidity.min && temp <= biome.temperature.max && temp >= biome.temperature.min) {
         return biome;
       }
     }
@@ -76,7 +80,7 @@ export class Chunk {
 
 export class World {
 
-  seed: number;
+  seed = {hum: 0, temp: 0};
   chunks: any = {};
   onscreen: Array<string> = [];
 
@@ -149,7 +153,7 @@ export class World {
   generateChunk(x:number, y:number, direction?:number): void {
     let coords = this.calculateDirection(x, y, direction);
     if (!this.chunkExists(coords.x, coords.y)) {
-      let chunk = new Chunk(coords.x, coords.y);
+      let chunk = new Chunk(coords.x, coords.y, this.seed);
       this.drawChunk(chunk);
       this.chunks[World.coordinatesToString(coords.x, coords.y)] = chunk;
       this.loadChunk(coords.x, coords.y);
@@ -203,7 +207,6 @@ export class World {
       if (Debug.worldtext) {
         Canvas.context.font = "10px sans-serif";
         Canvas.context.fillStyle = "rgba(255, 255, 255, 0.5)";
-        Canvas.context.fillText("n:" + tile.noise, tilepositionx + 5, tilepositiony + 12);
         Canvas.context.fillText("" + tile.x + ", " + tile.y, tilepositionx + 5, tilepositiony + 22);
         Canvas.context.fillText("" + (tile.x + (chunk.x * Chunk.tilesperside)) + ", " + (tile.y + (chunk.y * Chunk.tilesperside)), tilepositionx + 5, tilepositiony + 32);
       }
@@ -223,7 +226,7 @@ export class World {
   }
 
   generateSeed(): void {
-    this.seed = Math.random();
-    noise.seed(this.seed);
+    this.seed.hum = Math.random();
+    this.seed.temp = Math.random();
   }
 }

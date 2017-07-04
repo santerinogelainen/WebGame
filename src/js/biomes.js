@@ -13,38 +13,40 @@ exports.__esModule = true;
 var tiles = require("./tiles");
 var BiomeTemplate = (function () {
     function BiomeTemplate() {
+        this.temperature = { min: 0, max: 0 };
+        this.humidity = { min: 0, max: 0 };
     }
     //each biome has it's own implementation of getTile
     //this function returns a new Tile of the biomes type
-    BiomeTemplate.prototype.getTile = function (x, y, noise) { };
+    BiomeTemplate.prototype.getTile = function (x, y, hum, temp) { };
     ;
     return BiomeTemplate;
 }());
-var Planes = (function (_super) {
-    __extends(Planes, _super);
-    function Planes() {
+var Plains = (function (_super) {
+    __extends(Plains, _super);
+    function Plains() {
         var _this = _super.call(this) || this;
-        _this.min = 0;
-        _this.max = 15;
+        _this.temperature = { min: 0, max: 100 };
+        _this.humidity = { min: 0, max: 100 };
         return _this;
     }
-    Planes.prototype.getTile = function (x, y, noise) {
-        return new tiles.Grass(x, y, noise);
+    Plains.prototype.getTile = function (x, y, hum, temp) {
+        return new tiles.Grass(x, y, hum, temp);
     };
-    return Planes;
+    return Plains;
 }(BiomeTemplate));
-Planes.biomename = "Planes";
-Planes.id = 1;
+Plains.biomename = "Plains";
+Plains.id = 1;
 var Sea = (function (_super) {
     __extends(Sea, _super);
     function Sea() {
         var _this = _super.call(this) || this;
-        _this.min = 16;
-        _this.max = 30;
+        _this.temperature = { min: 25, max: 100 };
+        _this.humidity = { min: 75, max: 100 };
         return _this;
     }
-    Sea.prototype.getTile = function (x, y, noise) {
-        return new tiles.Water(x, y, noise);
+    Sea.prototype.getTile = function (x, y, hum, temp) {
+        return new tiles.Water(x, y, hum, temp);
     };
     return Sea;
 }(BiomeTemplate));
@@ -54,25 +56,75 @@ var Desert = (function (_super) {
     __extends(Desert, _super);
     function Desert() {
         var _this = _super.call(this) || this;
-        _this.min = 31;
-        _this.max = 45;
+        _this.temperature = { min: 75, max: 100 };
+        _this.humidity = { min: 0, max: 25 };
         return _this;
     }
-    Desert.prototype.getTile = function (x, y, noise) {
-        return new tiles.Sand(x, y, noise);
+    Desert.prototype.getTile = function (x, y, hum, temp) {
+        return new tiles.Sand(x, y, hum, temp);
     };
     return Desert;
 }(BiomeTemplate));
 Desert.biomename = "Desert";
 Desert.id = 3;
+var Forest = (function (_super) {
+    __extends(Forest, _super);
+    function Forest() {
+        var _this = _super.call(this) || this;
+        _this.temperature = { min: 25, max: 100 };
+        _this.humidity = { min: 25, max: 75 };
+        return _this;
+    }
+    Forest.prototype.getTile = function (x, y, hum, temp) {
+        return new tiles.Grass(x, y, hum, temp);
+    };
+    return Forest;
+}(BiomeTemplate));
+Forest.biomename = "Forest";
+Forest.id = 4;
+var Winter = (function (_super) {
+    __extends(Winter, _super);
+    function Winter() {
+        var _this = _super.call(this) || this;
+        _this.temperature = { min: 0, max: 25 };
+        _this.humidity = { min: 0, max: 50 };
+        return _this;
+    }
+    Winter.prototype.getTile = function (x, y, hum, temp) {
+        return new tiles.Snow(x, y, hum, temp);
+    };
+    return Winter;
+}(BiomeTemplate));
+Winter.biomename = "Winter";
+Winter.id = 5;
+var FrozenWater = (function (_super) {
+    __extends(FrozenWater, _super);
+    function FrozenWater() {
+        var _this = _super.call(this) || this;
+        _this.temperature = { min: 0, max: 25 };
+        _this.humidity = { min: 50, max: 100 };
+        return _this;
+    }
+    FrozenWater.prototype.getTile = function (x, y, hum, temp) {
+        return new tiles.Ice(x, y, hum, temp);
+    };
+    return FrozenWater;
+}(BiomeTemplate));
+FrozenWater.biomename = "Frozen Water";
+FrozenWater.id = 5;
 var Biome = (function () {
     function Biome() {
     }
     return Biome;
 }());
 Biome.intensity = 300;
-Biome.planes = new Planes();
+Biome.maxtemp = 100;
+Biome.maxhum = 100;
+Biome.plains = new Plains();
 Biome.sea = new Sea();
 Biome.desert = new Desert();
-Biome.biomes = [Biome.planes, Biome.sea, Biome.desert];
+Biome.forest = new Forest();
+Biome.winter = new Winter();
+Biome.frozenwater = new FrozenWater();
+Biome.biomes = [Biome.frozenwater, Biome.winter, Biome.desert, Biome.sea, Biome.forest, Biome.plains];
 exports.Biome = Biome;

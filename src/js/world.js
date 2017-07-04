@@ -7,11 +7,11 @@ var tiles_1 = require("./tiles");
 var debug_1 = require("./debug");
 var biomes_1 = require("./biomes");
 var Chunk = (function () {
-    function Chunk(x, y) {
+    function Chunk(x, y, seeds) {
         this.tiles = [];
         this.x = x;
         this.y = y;
-        this.generateTiles();
+        this.generateTiles(seeds);
     }
     Chunk.isOnScreen = function (chunk, playerx, playery) {
         var xplus = Math.ceil(playerx + (Chunk.perscreen / 2));
@@ -29,30 +29,34 @@ var Chunk = (function () {
         Chunk.perscreen.x = Math.ceil(canvas_1.Canvas.width / Chunk.chunksize);
         Chunk.perscreen.y = Math.ceil(canvas_1.Canvas.height / Chunk.chunksize);
     };
-    Chunk.prototype.generateTiles = function () {
+    Chunk.prototype.generateTiles = function (seeds) {
         var r = 1;
         while (r <= Chunk.tilesperside) {
             var c = 1;
             while (c <= Chunk.tilesperside) {
-                var noise_1 = this.generateTileNoise(r, c);
-                var biome = this.getTileBiome(noise_1);
-                var tile = biome.getTile(r, c, noise_1);
+                var noise_1 = this.generateTileNoise(r, c, seeds);
+                console.log(noise_1);
+                var biome = this.getTileBiome(noise_1[0], noise_1[1]);
+                var tile = biome.getTile(r, c, noise_1[0], noise_1[1]);
                 this.tiles.push(tile);
                 c++;
             }
             r++;
         }
     };
-    Chunk.prototype.generateTileNoise = function (tilex, tiley) {
+    Chunk.prototype.generateTileNoise = function (tilex, tiley, seeds) {
         var x = tilex + (this.x * Chunk.tilesperside);
         var y = tiley + (this.y * Chunk.tilesperside);
-        var biome = noise.perlin2(x / biomes_1.Biome.intensity, y / biomes_1.Biome.intensity) * 100;
-        return Math.abs(Math.round(biome));
+        noise.seed(seeds.hum);
+        var humidity = noise.simplex2(x / biomes_1.Biome.intensity, y / biomes_1.Biome.intensity) * biomes_1.Biome.maxhum;
+        noise.seed(seeds.temp);
+        var temperature = noise.simplex2(x / biomes_1.Biome.intensity, y / biomes_1.Biome.intensity) * biomes_1.Biome.maxtemp;
+        return [Math.abs(Math.round(humidity)), Math.abs(Math.round(temperature))];
     };
-    Chunk.prototype.getTileBiome = function (noise) {
+    Chunk.prototype.getTileBiome = function (hum, temp) {
         for (var _i = 0, _a = biomes_1.Biome.biomes; _i < _a.length; _i++) {
             var biome = _a[_i];
-            if (noise <= biome.max && noise >= biome.min) {
+            if (hum <= biome.humidity.max && hum >= biome.humidity.min && temp <= biome.temperature.max && temp >= biome.temperature.min) {
                 return biome;
             }
         }
@@ -66,6 +70,7 @@ Chunk.perscreen = { x: 0, y: 0 };
 exports.Chunk = Chunk;
 var World = (function () {
     function World() {
+        this.seed = { hum: 0, temp: 0 };
         this.chunks = {};
         this.onscreen = [];
         Chunk.calculatePerScreenRatio();
@@ -133,7 +138,7 @@ var World = (function () {
     World.prototype.generateChunk = function (x, y, direction) {
         var coords = this.calculateDirection(x, y, direction);
         if (!this.chunkExists(coords.x, coords.y)) {
-            var chunk = new Chunk(coords.x, coords.y);
+            var chunk = new Chunk(coords.x, coords.y, this.seed);
             this.drawChunk(chunk);
             this.chunks[World.coordinatesToString(coords.x, coords.y)] = chunk;
             this.loadChunk(coords.x, coords.y);
@@ -184,7 +189,6 @@ var World = (function () {
             if (debug_1.Debug.worldtext) {
                 canvas_1.Canvas.context.font = "10px sans-serif";
                 canvas_1.Canvas.context.fillStyle = "rgba(255, 255, 255, 0.5)";
-                canvas_1.Canvas.context.fillText("n:" + tile.noise, tilepositionx + 5, tilepositiony + 12);
                 canvas_1.Canvas.context.fillText("" + tile.x + ", " + tile.y, tilepositionx + 5, tilepositiony + 22);
                 canvas_1.Canvas.context.fillText("" + (tile.x + (chunk.x * Chunk.tilesperside)) + ", " + (tile.y + (chunk.y * Chunk.tilesperside)), tilepositionx + 5, tilepositiony + 32);
             }
@@ -203,8 +207,8 @@ var World = (function () {
         }
     };
     World.prototype.generateSeed = function () {
-        this.seed = Math.random();
-        noise.seed(this.seed);
+        this.seed.hum = Math.random();
+        this.seed.temp = Math.random();
     };
     return World;
 }());
