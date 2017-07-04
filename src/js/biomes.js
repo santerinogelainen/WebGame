@@ -117,7 +117,7 @@ var Biome = (function () {
     }
     return Biome;
 }());
-Biome.intensity = 300;
+Biome.intensity = 250;
 Biome.maxtemp = 100;
 Biome.maxhum = 100;
 Biome.plains = new Plains();

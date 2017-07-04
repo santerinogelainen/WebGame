@@ -104,7 +104,7 @@ class FrozenWater extends BiomeTemplate {
 }
 
 export class Biome {
-  static intensity: number = 300;
+  static intensity: number = 250;
   static maxtemp: number = 100;
   static maxhum: number = 100;
   static plains = new Plains();
