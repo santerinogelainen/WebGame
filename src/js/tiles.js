@@ -10,11 +10,10 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 exports.__esModule = true;
+var general_1 = require("./general");
 var Tile = (function () {
-    function Tile(x, y, humidity, temperature) {
+    function Tile(x, y) {
         this.texture = new Image();
-        this.humidity = humidity;
-        this.temperature = temperature;
         this.x = x;
         this.y = y;
     }
@@ -23,14 +22,21 @@ var Tile = (function () {
         var rng = Math.floor(Math.random() * src.length);
         this.texture.src = src[rng];
     };
+    Tile.generateNoise = function (x, y, seed) {
+        if (seed != null) {
+            noise.seed(seed);
+        }
+        return Math.abs(noise.perlin2(x, y));
+    };
     return Tile;
 }());
 Tile.tilesize = 40;
 exports.Tile = Tile;
 var Grass = (function (_super) {
     __extends(Grass, _super);
-    function Grass(x, y, humidity, temperature) {
-        var _this = _super.call(this, x, y, humidity, temperature) || this;
+    function Grass(x, y) {
+        var _this = _super.call(this, x, y) || this;
+        _this.color = new general_1.Color(77, 189, 51, 1);
         _this.textures = [
             "src/img/grass_3.png",
             "src/img/grass_4.png"
@@ -42,10 +48,27 @@ var Grass = (function (_super) {
 }(Tile));
 Grass.id = 1;
 exports.Grass = Grass;
+var DeepWater = (function (_super) {
+    __extends(DeepWater, _super);
+    function DeepWater(x, y) {
+        var _this = _super.call(this, x, y) || this;
+        _this.color = new general_1.Color(38, 98, 133, 1);
+        _this.textures = [
+            "src/img/water.png",
+            "src/img/water_1.png"
+        ];
+        _this.setTexture(_this.textures);
+        return _this;
+    }
+    return DeepWater;
+}(Tile));
+DeepWater.id = 2;
+exports.DeepWater = DeepWater;
 var Water = (function (_super) {
     __extends(Water, _super);
-    function Water(x, y, humidity, temperature) {
-        var _this = _super.call(this, x, y, humidity, temperature) || this;
+    function Water(x, y) {
+        var _this = _super.call(this, x, y) || this;
+        _this.color = new general_1.Color(64, 164, 223, 1);
         _this.textures = [
             "src/img/water.png",
             "src/img/water_1.png"
@@ -59,8 +82,9 @@ Water.id = 2;
 exports.Water = Water;
 var Sand = (function (_super) {
     __extends(Sand, _super);
-    function Sand(x, y, humidity, temperature) {
-        var _this = _super.call(this, x, y, humidity, temperature) || this;
+    function Sand(x, y) {
+        var _this = _super.call(this, x, y) || this;
+        _this.color = new general_1.Color(237, 201, 175, 1);
         _this.textures = [
             "src/img/sand.png",
             "src/img/sand_1.png",
@@ -75,8 +99,9 @@ Sand.id = 3;
 exports.Sand = Sand;
 var Ice = (function (_super) {
     __extends(Ice, _super);
-    function Ice(x, y, humidity, temperature) {
-        var _this = _super.call(this, x, y, humidity, temperature) || this;
+    function Ice(x, y) {
+        var _this = _super.call(this, x, y) || this;
+        _this.color = new general_1.Color(212, 240, 255, 1);
         _this.textures = [
             "src/img/ice.png"
         ];
@@ -89,8 +114,9 @@ Ice.id = 4;
 exports.Ice = Ice;
 var Snow = (function (_super) {
     __extends(Snow, _super);
-    function Snow(x, y, humidity, temperature) {
-        var _this = _super.call(this, x, y, humidity, temperature) || this;
+    function Snow(x, y) {
+        var _this = _super.call(this, x, y) || this;
+        _this.color = new general_1.Color(248, 248, 255, 1);
         _this.textures = [
             "src/img/snow.png"
         ];

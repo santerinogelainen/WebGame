@@ -5,6 +5,8 @@ import { Tile } from "./tiles";
 import { Grass } from "./tiles";
 import { Debug } from "./debug";
 import { Biome } from "./biomes";
+import { Sea } from "./biomes";
+import { Settings } from "./settings";
 declare var noise;
 
 export class Chunk {
@@ -17,10 +19,10 @@ export class Chunk {
   x: number;
   y: number;
 
-  constructor(x:number, y: number, seeds) {
+  constructor(x:number, y: number, seed) {
     this.x = x;
     this.y = y;
-    this.generateTiles(seeds);
+    this.generateTiles(seed);
   }
 
   static isOnScreen(chunk: Chunk, playerx: number, playery: number): boolean {
@@ -40,37 +42,24 @@ export class Chunk {
     Chunk.perscreen.y = Math.ceil(Canvas.height / Chunk.chunksize);
   }
 
-  generateTiles(seeds): void {
+  generateTiles(seed): void {
     let r:number = 1;
     while (r <= Chunk.tilesperside) {
       let c = 1;
       while (c <= Chunk.tilesperside) {
-        let noise = this.generateTileNoise(r, c, seeds);
-        console.log(noise);
-        let biome = this.getTileBiome(noise[0], noise[1]);
-        let tile = biome.getTile(r, c, noise[0], noise[1]);
+        let tile;
+        let x = r + (this.x * Chunk.tilesperside);
+        let y = c + (this.y * Chunk.tilesperside);
+        let islandnoise = Tile.generateNoise((x / Biome.islandsize), (y / Biome.islandsize), seed.island) * Biome.islandmax;
+        if (islandnoise >= Sea.noise.min && islandnoise <= Sea.noise.max) {
+          tile = Sea.getTile(r, c, islandnoise);
+        } else {
+          tile = Biome.get["plains"].getTile(r, c);
+        }
         this.tiles.push(tile);
         c++;
       }
       r++;
-    }
-  }
-
-  generateTileNoise(tilex: number, tiley: number, seeds) {
-    let x = tilex + (this.x * Chunk.tilesperside);
-    let y = tiley + (this.y * Chunk.tilesperside);
-    noise.seed(seeds.hum);
-    let humidity = noise.simplex2(x / Biome.intensity, y / Biome.intensity) * Biome.maxhum;
-    noise.seed(seeds.temp);
-    let temperature = noise.simplex2(x / Biome.intensity, y / Biome.intensity) * Biome.maxtemp;
-    return [Math.abs(Math.round(humidity)), Math.abs(Math.round(temperature))];
-  }
-
-  getTileBiome(hum: number, temp: number) {
-    for (let biome of Biome.biomes) {
-      if (hum <= biome.humidity.max && hum >= biome.humidity.min && temp <= biome.temperature.max && temp >= biome.temperature.min) {
-        return biome;
-      }
     }
   }
 }
@@ -80,7 +69,7 @@ export class Chunk {
 
 export class World {
 
-  seed = {hum: 0, temp: 0};
+  seed = {island: 0};
   chunks: any = {};
   onscreen: Array<string> = [];
 
@@ -202,7 +191,12 @@ export class World {
         Canvas.context.strokeStyle = "rgba(255, 255, 255, 0.5)";
         Canvas.context.stroke();
       } else {
-        Canvas.context.drawImage(tile.texture, tilepositionx, tilepositiony, Tile.tilesize, Tile.tilesize);
+        if (Settings.usetilecolor) {
+          Canvas.context.fillStyle = tile.color.getRGBA();
+          Canvas.context.fillRect(tilepositionx, tilepositiony, Tile.tilesize, Tile.tilesize);
+        } else {
+          Canvas.context.drawImage(tile.texture, tilepositionx, tilepositiony, Tile.tilesize, Tile.tilesize);
+        }
       }
       if (Debug.worldtext) {
         Canvas.context.font = "10px sans-serif";
@@ -226,7 +220,6 @@ export class World {
   }
 
   generateSeed(): void {
-    this.seed.hum = Math.random();
-    this.seed.temp = Math.random();
+    this.seed.island = Math.floor(Math.random() * 9999) + 1000;
   }
 }

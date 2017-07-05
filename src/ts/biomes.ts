@@ -2,20 +2,17 @@
 import * as tiles from "./tiles";
 
 class BiomeTemplate {
-  //every biome has a name, id, min noise and max noise
   static biomename: string;
-  static id: number;
   temperature = {min: 0, max:0};
   humidity = {min: 0, max: 0};
 
   //each biome has it's own implementation of getTile
   //this function returns a new Tile of the biomes type
-  getTile(x: number, y:number, hum:number, temp:number){};
+  getTile(x: number, y:number){};
 }
 
 class Plains extends BiomeTemplate {
   static biomename = "Plains";
-  static id = 1;
   temperature = {min: 0, max:100};
   humidity = {min: 0, max: 100};
 
@@ -23,29 +20,33 @@ class Plains extends BiomeTemplate {
     super();
   }
 
-  getTile(x: number, y: number, hum: number, temp: number) {
-    return new tiles.Grass(x, y, hum, temp);
+  getTile(x: number, y: number) {
+    return new tiles.Grass(x, y);
   }
 }
 
-class Sea extends BiomeTemplate {
+export class Sea {
   static biomename = "Sea";
-  static id = 2;
-  temperature = {min: 25, max:100};
-  humidity = {min: 75, max: 100};
+  static noise = {
+    min: 0,
+    max: 30
+  };
 
-  constructor() {
-    super();
-  }
-
-  getTile(x: number, y: number, hum: number, temp: number) {
-    return new tiles.Water(x, y, hum, temp);
+  static getTile(x: number, y: number, noise: number) {
+    if ( noise < 24 ) {
+      return new tiles.DeepWater(x, y);
+    } else {
+      if ( noise <= 27 ) {
+        return new tiles.Water(x, y);
+      } else {
+        return new tiles.Sand(x, y);
+      }
+    }
   }
 }
 
 class Desert extends BiomeTemplate {
   static biomename = "Desert";
-  static id = 3;
   temperature = {min: 75, max:100};
   humidity = {min: 0, max: 25};
 
@@ -53,65 +54,55 @@ class Desert extends BiomeTemplate {
     super();
   }
 
-  getTile(x: number, y: number, hum: number, temp: number) {
-    return new tiles.Sand(x, y, hum, temp);
+  getTile(x: number, y: number) {
+    return new tiles.Sand(x, y);
   }
 }
 
-class Forest extends BiomeTemplate {
+class Forest extends Plains {
   static biomename = "Forest";
-  static id = 4;
   temperature = {min: 25, max:100};
   humidity = {min: 25, max: 75};
-
-  constructor() {
-    super();
-  }
-
-  getTile(x: number, y: number, hum: number, temp: number) {
-    return new tiles.Grass(x, y, hum, temp);
-  }
 }
 
 class Winter extends BiomeTemplate {
   static biomename = "Winter";
-  static id = 5;
   temperature = {min: 0, max:25};
-  humidity = {min: 0, max: 50};
+  humidity = {min: 0, max: 80};
 
   constructor() {
     super();
   }
 
-  getTile(x: number, y: number, hum: number, temp: number) {
-    return new tiles.Snow(x, y, hum, temp);
+  getTile(x: number, y: number) {
+    return new tiles.Snow(x, y);
   }
+}
+
+class WinterForest extends Winter {
+  static biomename = "Winter Forest";
+  temperature = {min: 0, max:25};
+  humidity = {min: 25, max: 70};
 }
 
 class FrozenWater extends BiomeTemplate {
   static biomename = "Frozen Water";
-  static id = 5;
   temperature = {min: 0, max:25};
-  humidity = {min: 50, max: 100};
+  humidity = {min: 80, max: 100};
 
   constructor() {
     super();
   }
 
-  getTile(x: number, y: number, hum: number, temp: number) {
-    return new tiles.Ice(x, y, hum, temp);
+  getTile(x: number, y: number) {
+    return new tiles.Ice(x, y);
   }
 }
 
 export class Biome {
-  static intensity: number = 250;
-  static maxtemp: number = 100;
-  static maxhum: number = 100;
-  static plains = new Plains();
-  static sea = new Sea();
-  static desert = new Desert();
-  static forest = new Forest();
-  static winter = new Winter();
-  static frozenwater = new FrozenWater();
-  static biomes = [Biome.frozenwater, Biome.winter, Biome.desert, Biome.sea, Biome.forest, Biome.plains];
+  static islandsize: number = 150;
+  static islandmax: number = 100;
+  static get = {
+    "plains": new Plains()
+  };
 }

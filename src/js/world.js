@@ -6,12 +6,14 @@ var general_2 = require("./general");
 var tiles_1 = require("./tiles");
 var debug_1 = require("./debug");
 var biomes_1 = require("./biomes");
+var biomes_2 = require("./biomes");
+var settings_1 = require("./settings");
 var Chunk = (function () {
-    function Chunk(x, y, seeds) {
+    function Chunk(x, y, seed) {
         this.tiles = [];
         this.x = x;
         this.y = y;
-        this.generateTiles(seeds);
+        this.generateTiles(seed);
     }
     Chunk.isOnScreen = function (chunk, playerx, playery) {
         var xplus = Math.ceil(playerx + (Chunk.perscreen / 2));
@@ -29,36 +31,25 @@ var Chunk = (function () {
         Chunk.perscreen.x = Math.ceil(canvas_1.Canvas.width / Chunk.chunksize);
         Chunk.perscreen.y = Math.ceil(canvas_1.Canvas.height / Chunk.chunksize);
     };
-    Chunk.prototype.generateTiles = function (seeds) {
+    Chunk.prototype.generateTiles = function (seed) {
         var r = 1;
         while (r <= Chunk.tilesperside) {
             var c = 1;
             while (c <= Chunk.tilesperside) {
-                var noise_1 = this.generateTileNoise(r, c, seeds);
-                console.log(noise_1);
-                var biome = this.getTileBiome(noise_1[0], noise_1[1]);
-                var tile = biome.getTile(r, c, noise_1[0], noise_1[1]);
+                var tile = void 0;
+                var x = r + (this.x * Chunk.tilesperside);
+                var y = c + (this.y * Chunk.tilesperside);
+                var islandnoise = tiles_1.Tile.generateNoise((x / biomes_1.Biome.islandsize), (y / biomes_1.Biome.islandsize), seed.island) * biomes_1.Biome.islandmax;
+                if (islandnoise >= biomes_2.Sea.noise.min && islandnoise <= biomes_2.Sea.noise.max) {
+                    tile = biomes_2.Sea.getTile(r, c, islandnoise);
+                }
+                else {
+                    tile = biomes_1.Biome.get["plains"].getTile(r, c);
+                }
                 this.tiles.push(tile);
                 c++;
             }
             r++;
-        }
-    };
-    Chunk.prototype.generateTileNoise = function (tilex, tiley, seeds) {
-        var x = tilex + (this.x * Chunk.tilesperside);
-        var y = tiley + (this.y * Chunk.tilesperside);
-        noise.seed(seeds.hum);
-        var humidity = noise.simplex2(x / biomes_1.Biome.intensity, y / biomes_1.Biome.intensity) * biomes_1.Biome.maxhum;
-        noise.seed(seeds.temp);
-        var temperature = noise.simplex2(x / biomes_1.Biome.intensity, y / biomes_1.Biome.intensity) * biomes_1.Biome.maxtemp;
-        return [Math.abs(Math.round(humidity)), Math.abs(Math.round(temperature))];
-    };
-    Chunk.prototype.getTileBiome = function (hum, temp) {
-        for (var _i = 0, _a = biomes_1.Biome.biomes; _i < _a.length; _i++) {
-            var biome = _a[_i];
-            if (hum <= biome.humidity.max && hum >= biome.humidity.min && temp <= biome.temperature.max && temp >= biome.temperature.min) {
-                return biome;
-            }
         }
     };
     return Chunk;
@@ -70,7 +61,7 @@ Chunk.perscreen = { x: 0, y: 0 };
 exports.Chunk = Chunk;
 var World = (function () {
     function World() {
-        this.seed = { hum: 0, temp: 0 };
+        this.seed = { island: 0 };
         this.chunks = {};
         this.onscreen = [];
         Chunk.calculatePerScreenRatio();
@@ -184,7 +175,13 @@ var World = (function () {
                 canvas_1.Canvas.context.stroke();
             }
             else {
-                canvas_1.Canvas.context.drawImage(tile.texture, tilepositionx, tilepositiony, tiles_1.Tile.tilesize, tiles_1.Tile.tilesize);
+                if (settings_1.Settings.usetilecolor) {
+                    canvas_1.Canvas.context.fillStyle = tile.color.getRGBA();
+                    canvas_1.Canvas.context.fillRect(tilepositionx, tilepositiony, tiles_1.Tile.tilesize, tiles_1.Tile.tilesize);
+                }
+                else {
+                    canvas_1.Canvas.context.drawImage(tile.texture, tilepositionx, tilepositiony, tiles_1.Tile.tilesize, tiles_1.Tile.tilesize);
+                }
             }
             if (debug_1.Debug.worldtext) {
                 canvas_1.Canvas.context.font = "10px sans-serif";
@@ -207,8 +204,7 @@ var World = (function () {
         }
     };
     World.prototype.generateSeed = function () {
-        this.seed.hum = Math.random();
-        this.seed.temp = Math.random();
+        this.seed.island = Math.floor(Math.random() * 9999) + 1000;
     };
     return World;
 }());

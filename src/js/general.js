@@ -20,6 +20,9 @@ var Color = (function () {
         this.b = b;
         this.a = a;
     }
+    Color.prototype.getRGBA = function () {
+        return "rgba(" + this.r + ", " + this.g + ", " + this.b + ", " + this.a + ")";
+    };
     return Color;
 }());
 exports.Color = Color;
