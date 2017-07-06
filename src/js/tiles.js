@@ -22,11 +22,17 @@ var Tile = (function () {
         var rng = Math.floor(Math.random() * src.length);
         this.texture.src = src[rng];
     };
-    Tile.generateNoise = function (x, y, seed) {
+    Tile.generateNoise = function (x, y, seed, abs) {
+        if (abs === void 0) { abs = false; }
         if (seed != null) {
             noise.seed(seed);
         }
-        return Math.abs(noise.perlin2(x, y));
+        if (abs) {
+            return Math.abs(noise.simplex2(x, y));
+        }
+        else {
+            return noise.simplex2(x, y);
+        }
     };
     return Tile;
 }());

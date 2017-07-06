@@ -6,6 +6,10 @@ export enum Position {
   X, Y, Z
 }
 
+export function rng(min: number, max:number) {
+  return Math.floor(Math.random() * (max - min + 1) + min);
+}
+
 export class Color {
   r: number;
   g: number;

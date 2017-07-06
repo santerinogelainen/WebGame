@@ -8,6 +8,7 @@ var debug_1 = require("./debug");
 var biomes_1 = require("./biomes");
 var biomes_2 = require("./biomes");
 var settings_1 = require("./settings");
+var general_3 = require("./general");
 var Chunk = (function () {
     function Chunk(x, y, seed) {
         this.tiles = [];
@@ -39,17 +40,31 @@ var Chunk = (function () {
                 var tile = void 0;
                 var x = r + (this.x * Chunk.tilesperside);
                 var y = c + (this.y * Chunk.tilesperside);
-                var islandnoise = tiles_1.Tile.generateNoise((x / biomes_1.Biome.islandsize), (y / biomes_1.Biome.islandsize), seed.island) * biomes_1.Biome.islandmax;
+                var islandnoise = tiles_1.Tile.generateNoise((x / biomes_1.Biome.islandsize), (y / biomes_1.Biome.islandsize), seed.island, true) * biomes_1.Biome.islandmax;
                 if (islandnoise >= biomes_2.Sea.noise.min && islandnoise <= biomes_2.Sea.noise.max) {
                     tile = biomes_2.Sea.getTile(r, c, islandnoise);
                 }
                 else {
-                    tile = biomes_1.Biome.get["plains"].getTile(r, c);
+                    console.log("x: " + x + ", y: " + y);
+                    var temp = tiles_1.Tile.generateNoise((x / biomes_1.Biome.tempsize), (y / biomes_1.Biome.tempsize), seed.biome.temp) * biomes_1.Biome.tempmax;
+                    var hum = tiles_1.Tile.generateNoise((x / biomes_1.Biome.humsize), (y / biomes_1.Biome.humsize), seed.biome.hum) * biomes_1.Biome.hummax;
+                    console.log(seed);
+                    console.log("temp: " + temp + ", hum: " + hum);
+                    var biome = this.getBiome(temp, hum);
+                    tile = biome.getTile(r, c);
                 }
                 this.tiles.push(tile);
                 c++;
             }
             r++;
+        }
+    };
+    Chunk.prototype.getBiome = function (temp, hum) {
+        for (var biome in biomes_1.Biome.get) {
+            var b = biomes_1.Biome.get[biome];
+            if ((temp >= b.temperature.min && temp <= b.temperature.max) && (hum >= b.humidity.min && hum <= b.humidity.max)) {
+                return b;
+            }
         }
     };
     return Chunk;
@@ -61,7 +76,13 @@ Chunk.perscreen = { x: 0, y: 0 };
 exports.Chunk = Chunk;
 var World = (function () {
     function World() {
-        this.seed = { island: 0 };
+        this.seed = {
+            island: 0,
+            biome: {
+                temp: 0,
+                hum: 0
+            }
+        };
         this.chunks = {};
         this.onscreen = [];
         Chunk.calculatePerScreenRatio();
@@ -204,7 +225,9 @@ var World = (function () {
         }
     };
     World.prototype.generateSeed = function () {
-        this.seed.island = Math.floor(Math.random() * 9999) + 1000;
+        this.seed.island = general_3.rng(1, 65536);
+        this.seed.biome.temp = general_3.rng(1, 65536);
+        this.seed.biome.hum = general_3.rng(1, 65536);
     };
     return World;
 }());

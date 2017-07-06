@@ -23,11 +23,15 @@ export class Tile {
     this.texture.src = src[rng];
   }
 
-  static generateNoise(x: number, y: number, seed?: number) {
+  static generateNoise(x: number, y: number, seed?: number, abs:boolean = false) {
     if (seed != null) {
       noise.seed(seed);
     }
-    return Math.abs(noise.perlin2(x, y));
+    if (abs) {
+      return Math.abs(noise.simplex2(x, y));
+    } else {
+      return noise.simplex2(x, y);
+    }
   }
 
 }

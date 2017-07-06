@@ -1,10 +1,15 @@
 
 import * as tiles from "./tiles";
 
+interface Noise {
+  min: number,
+  max: number
+}
+
 class BiomeTemplate {
   static biomename: string;
-  temperature = {min: 0, max:0};
-  humidity = {min: 0, max: 0};
+  temperature: Noise;
+  humidity: Noise;
 
   //each biome has it's own implementation of getTile
   //this function returns a new Tile of the biomes type
@@ -13,8 +18,14 @@ class BiomeTemplate {
 
 class Plains extends BiomeTemplate {
   static biomename = "Plains";
-  temperature = {min: 0, max:100};
-  humidity = {min: 0, max: 100};
+  temperature = {
+    min: -50,
+    max: 50
+  };
+  humidity = {
+    min: -50,
+    max: 50
+  };
 
   constructor() {
     super();
@@ -47,8 +58,14 @@ export class Sea {
 
 class Desert extends BiomeTemplate {
   static biomename = "Desert";
-  temperature = {min: 75, max:100};
-  humidity = {min: 0, max: 25};
+  temperature = {
+    min: 25,
+    max:50
+  };
+  humidity = {
+    min: 0,
+    max: 25
+  };
 
   constructor() {
     super();
@@ -61,14 +78,26 @@ class Desert extends BiomeTemplate {
 
 class Forest extends Plains {
   static biomename = "Forest";
-  temperature = {min: 25, max:100};
-  humidity = {min: 25, max: 75};
+  temperature = {
+    min: -25,
+    max: 25
+  };
+  humidity = {
+    min: -25,
+    max: 50
+  };
 }
 
 class Winter extends BiomeTemplate {
   static biomename = "Winter";
-  temperature = {min: 0, max:25};
-  humidity = {min: 0, max: 80};
+  temperature = {
+    min: -50,
+    max: -25
+  };
+  humidity = {
+    min: -50,
+    max: -25
+  };
 
   constructor() {
     super();
@@ -81,11 +110,11 @@ class Winter extends BiomeTemplate {
 
 class WinterForest extends Winter {
   static biomename = "Winter Forest";
-  temperature = {min: 0, max:25};
-  humidity = {min: 25, max: 70};
+  temperature = {min: -50, max: -25};
+  humidity = {min: -25, max: 50};
 }
 
-class FrozenWater extends BiomeTemplate {
+/*class FrozenWater extends BiomeTemplate {
   static biomename = "Frozen Water";
   temperature = {min: 0, max:25};
   humidity = {min: 80, max: 100};
@@ -97,12 +126,20 @@ class FrozenWater extends BiomeTemplate {
   getTile(x: number, y: number) {
     return new tiles.Ice(x, y);
   }
-}
+}*/
 
 export class Biome {
   static islandsize: number = 150;
   static islandmax: number = 100;
+  static tempsize: number = 150;
+  static tempmax: number = 50;
+  static humsize: number = 150;
+  static hummax: number = 50;
   static get = {
+    "forest": new Forest(),
+    "desert": new Desert(),
+    "winterforest": new WinterForest(),
+    "winter": new Winter(),
     "plains": new Plains()
   };
 }

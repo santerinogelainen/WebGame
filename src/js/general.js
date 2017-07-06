@@ -13,6 +13,10 @@ var Position;
     Position[Position["Y"] = 1] = "Y";
     Position[Position["Z"] = 2] = "Z";
 })(Position = exports.Position || (exports.Position = {}));
+function rng(min, max) {
+    return Math.floor(Math.random() * (max - min + 1) + min);
+}
+exports.rng = rng;
 var Color = (function () {
     function Color(r, g, b, a) {
         this.r = r;

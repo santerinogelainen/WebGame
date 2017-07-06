@@ -13,8 +13,6 @@ exports.__esModule = true;
 var tiles = require("./tiles");
 var BiomeTemplate = (function () {
     function BiomeTemplate() {
-        this.temperature = { min: 0, max: 0 };
-        this.humidity = { min: 0, max: 0 };
     }
     //each biome has it's own implementation of getTile
     //this function returns a new Tile of the biomes type
@@ -26,8 +24,14 @@ var Plains = (function (_super) {
     __extends(Plains, _super);
     function Plains() {
         var _this = _super.call(this) || this;
-        _this.temperature = { min: 0, max: 100 };
-        _this.humidity = { min: 0, max: 100 };
+        _this.temperature = {
+            min: -50,
+            max: 50
+        };
+        _this.humidity = {
+            min: -50,
+            max: 50
+        };
         return _this;
     }
     Plains.prototype.getTile = function (x, y) {
@@ -64,8 +68,14 @@ var Desert = (function (_super) {
     __extends(Desert, _super);
     function Desert() {
         var _this = _super.call(this) || this;
-        _this.temperature = { min: 75, max: 100 };
-        _this.humidity = { min: 0, max: 25 };
+        _this.temperature = {
+            min: 25,
+            max: 50
+        };
+        _this.humidity = {
+            min: 0,
+            max: 25
+        };
         return _this;
     }
     Desert.prototype.getTile = function (x, y) {
@@ -78,8 +88,14 @@ var Forest = (function (_super) {
     __extends(Forest, _super);
     function Forest() {
         var _this = _super !== null && _super.apply(this, arguments) || this;
-        _this.temperature = { min: 25, max: 100 };
-        _this.humidity = { min: 25, max: 75 };
+        _this.temperature = {
+            min: -25,
+            max: 25
+        };
+        _this.humidity = {
+            min: -25,
+            max: 50
+        };
         return _this;
     }
     return Forest;
@@ -89,8 +105,14 @@ var Winter = (function (_super) {
     __extends(Winter, _super);
     function Winter() {
         var _this = _super.call(this) || this;
-        _this.temperature = { min: 0, max: 25 };
-        _this.humidity = { min: 0, max: 80 };
+        _this.temperature = {
+            min: -50,
+            max: -25
+        };
+        _this.humidity = {
+            min: -50,
+            max: -25
+        };
         return _this;
     }
     Winter.prototype.getTile = function (x, y) {
@@ -103,27 +125,26 @@ var WinterForest = (function (_super) {
     __extends(WinterForest, _super);
     function WinterForest() {
         var _this = _super !== null && _super.apply(this, arguments) || this;
-        _this.temperature = { min: 0, max: 25 };
-        _this.humidity = { min: 25, max: 70 };
+        _this.temperature = { min: -50, max: -25 };
+        _this.humidity = { min: -25, max: 50 };
         return _this;
     }
     return WinterForest;
 }(Winter));
 WinterForest.biomename = "Winter Forest";
-var FrozenWater = (function (_super) {
-    __extends(FrozenWater, _super);
-    function FrozenWater() {
-        var _this = _super.call(this) || this;
-        _this.temperature = { min: 0, max: 25 };
-        _this.humidity = { min: 80, max: 100 };
-        return _this;
-    }
-    FrozenWater.prototype.getTile = function (x, y) {
-        return new tiles.Ice(x, y);
-    };
-    return FrozenWater;
-}(BiomeTemplate));
-FrozenWater.biomename = "Frozen Water";
+/*class FrozenWater extends BiomeTemplate {
+  static biomename = "Frozen Water";
+  temperature = {min: 0, max:25};
+  humidity = {min: 80, max: 100};
+
+  constructor() {
+    super();
+  }
+
+  getTile(x: number, y: number) {
+    return new tiles.Ice(x, y);
+  }
+}*/
 var Biome = (function () {
     function Biome() {
     }
@@ -131,7 +152,15 @@ var Biome = (function () {
 }());
 Biome.islandsize = 150;
 Biome.islandmax = 100;
+Biome.tempsize = 150;
+Biome.tempmax = 50;
+Biome.humsize = 150;
+Biome.hummax = 50;
 Biome.get = {
+    "forest": new Forest(),
+    "desert": new Desert(),
+    "winterforest": new WinterForest(),
+    "winter": new Winter(),
     "plains": new Plains()
 };
 exports.Biome = Biome;

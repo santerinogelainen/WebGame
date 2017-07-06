@@ -7,7 +7,12 @@ import { Debug } from "./debug";
 import { Biome } from "./biomes";
 import { Sea } from "./biomes";
 import { Settings } from "./settings";
+import { rng } from "./general";
 declare var noise;
+
+
+
+
 
 export class Chunk {
 
@@ -50,11 +55,17 @@ export class Chunk {
         let tile;
         let x = r + (this.x * Chunk.tilesperside);
         let y = c + (this.y * Chunk.tilesperside);
-        let islandnoise = Tile.generateNoise((x / Biome.islandsize), (y / Biome.islandsize), seed.island) * Biome.islandmax;
+        let islandnoise = Tile.generateNoise((x / Biome.islandsize), (y / Biome.islandsize), seed.island, true) * Biome.islandmax;
         if (islandnoise >= Sea.noise.min && islandnoise <= Sea.noise.max) {
           tile = Sea.getTile(r, c, islandnoise);
         } else {
-          tile = Biome.get["plains"].getTile(r, c);
+        console.log("x: " + x + ", y: " + y)
+          let temp: number = Tile.generateNoise((x / Biome.tempsize), (y / Biome.tempsize), seed.biome.temp) * Biome.tempmax;
+          let hum: number = Tile.generateNoise((x / Biome.humsize), (y / Biome.humsize), seed.biome.hum) * Biome.hummax;
+          console.log(seed);
+          console.log("temp: " + temp + ", hum: " + hum);
+          let biome = this.getBiome(temp, hum);
+          tile = biome.getTile(r, c);
         }
         this.tiles.push(tile);
         c++;
@@ -62,14 +73,35 @@ export class Chunk {
       r++;
     }
   }
+
+  getBiome(temp: number, hum: number) {
+    for (let biome in Biome.get) {
+      let b = Biome.get[biome];
+      if ((temp >= b.temperature.min && temp <= b.temperature.max) && (hum >= b.humidity.min && hum <= b.humidity.max)) {
+        return b;
+      }
+    }
+  }
 }
+
+
+
+
+
+
 
 
 
 
 export class World {
 
-  seed = {island: 0};
+  seed = {
+    island: 0,
+    biome: {
+      temp: 0,
+      hum: 0
+    }
+  };
   chunks: any = {};
   onscreen: Array<string> = [];
 
@@ -220,6 +252,8 @@ export class World {
   }
 
   generateSeed(): void {
-    this.seed.island = Math.floor(Math.random() * 9999) + 1000;
+    this.seed.island = rng(1, 65536);
+    this.seed.biome.temp = rng(1, 65536);
+    this.seed.biome.hum = rng(1, 65536);
   }
 }
