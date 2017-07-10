@@ -11,6 +11,9 @@ var __extends = (this && this.__extends) || (function () {
 })();
 exports.__esModule = true;
 var general_1 = require("./general");
+var settings_1 = require("./settings");
+var canvas_1 = require("./canvas");
+var debug_1 = require("./debug");
 var Tile = (function () {
     function Tile(x, y) {
         this.texture = new Image();
@@ -32,6 +35,28 @@ var Tile = (function () {
         }
         else {
             return noise.simplex2(x, y);
+        }
+    };
+    Tile.prototype.draw = function (x, y) {
+        canvas_1.Canvas.context.beginPath();
+        if (debug_1.Debug.lines) {
+            canvas_1.Canvas.context.rect(x, y, Tile.tilesize, Tile.tilesize);
+            canvas_1.Canvas.context.strokeStyle = this.color.getRGBA();
+            canvas_1.Canvas.context.stroke();
+        }
+        else {
+            if (settings_1.Settings.usetilecolor) {
+                canvas_1.Canvas.context.fillStyle = this.color.getRGBA();
+                canvas_1.Canvas.context.fillRect(x, y, Tile.tilesize, Tile.tilesize);
+            }
+            else {
+                canvas_1.Canvas.context.drawImage(this.texture, x, y, Tile.tilesize, Tile.tilesize);
+            }
+        }
+        if (debug_1.Debug.worldtext) {
+            canvas_1.Canvas.context.font = "10px sans-serif";
+            canvas_1.Canvas.context.fillStyle = "rgba(255, 255, 255, 0.5)";
+            canvas_1.Canvas.context.fillText("" + this.x + ", " + this.y, x + 5, y + 22);
         }
     };
     return Tile;

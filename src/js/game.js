@@ -41,35 +41,6 @@ var Game = (function () {
         Game.world = new world_1.World();
         Game.player = new character_1.Player(1, "asd");
     };
-    Game.checkPlayerPosition = function () {
-        var pos = Game.player.position;
-        var loadsens = world_2.Chunk.loadsensitivity;
-        if (pos.tile.x <= loadsens) {
-            Game.world.generateChunk(pos.chunk.x, pos.chunk.y, general_1.Direction.LEFT);
-        }
-        if (pos.tile.x >= (world_2.Chunk.tilesperside - loadsens + 1)) {
-            Game.world.generateChunk(pos.chunk.x, pos.chunk.y, general_1.Direction.RIGHT);
-        }
-        if (pos.tile.y <= loadsens) {
-            Game.world.generateChunk(pos.chunk.x, pos.chunk.y, general_1.Direction.DOWN);
-            if (pos.tile.x <= loadsens) {
-                Game.world.generateChunk(pos.chunk.x, pos.chunk.y - 1, general_1.Direction.LEFT);
-            }
-            if (pos.tile.x >= (world_2.Chunk.tilesperside - loadsens)) {
-                Game.world.generateChunk(pos.chunk.x, pos.chunk.y - 1, general_1.Direction.RIGHT);
-            }
-        }
-        if (pos.tile.y >= (world_2.Chunk.tilesperside - loadsens + 1)) {
-            Game.world.generateChunk(pos.chunk.x, pos.chunk.y, general_1.Direction.UP);
-            if (pos.tile.x <= loadsens) {
-                Game.world.generateChunk(pos.chunk.x, pos.chunk.y + 1, general_1.Direction.LEFT);
-            }
-            if (pos.tile.x >= (world_2.Chunk.tilesperside - loadsens + 1)) {
-                Game.world.generateChunk(pos.chunk.x, pos.chunk.y + 1, general_1.Direction.RIGHT);
-            }
-        }
-        Game.world.generateChunk(pos.chunk.x, pos.chunk.y);
-    };
     Game.getDebugLines = function () {
         var debugLines = [
             "Loaded chunks: " + Game.world.onscreen.join(", "),
@@ -117,7 +88,6 @@ var Game = (function () {
         Game.player.walk(Game.key);
         var newPosition = { x: Game.player.position.chunk.x, y: Game.player.position.chunk.y };
         Game.comparePositions(oldPosition, newPosition);
-        Game.checkPlayerPosition();
         Game.updateScreen();
     };
     return Game;

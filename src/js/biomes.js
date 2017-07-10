@@ -150,7 +150,7 @@ var Biome = (function () {
     }
     return Biome;
 }());
-Biome.islandsize = 150;
+Biome.islandsize = 500;
 Biome.islandmax = 100;
 Biome.tempsize = 150;
 Biome.tempmax = 50;

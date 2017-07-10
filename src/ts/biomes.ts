@@ -129,7 +129,7 @@ class WinterForest extends Winter {
 }*/
 
 export class Biome {
-  static islandsize: number = 150;
+  static islandsize: number = 500;
   static islandmax: number = 100;
   static tempsize: number = 150;
   static tempmax: number = 50;

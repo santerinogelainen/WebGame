@@ -27,27 +27,21 @@ export class Chunk {
   constructor(x:number, y: number, seed) {
     this.x = x;
     this.y = y;
-    this.generateTiles(seed);
+    this.generate(seed);
   }
 
-  static isOnScreen(chunk: Chunk, playerx: number, playery: number): boolean {
-    let xplus: number = Math.ceil(playerx + (Chunk.perscreen / 2));
-    let xminus: number = Math.floor(playerx - (Chunk.perscreen / 2));
-    let yplus: number = Math.ceil(playery + (Chunk.perscreen / 2));
-    let yminus:number = Math.floor(playery - (Chunk.perscreen / 2));
-    if (chunk.x > xplus || chunk.x < xminus || chunk.y > yplus || chunk.y < yminus) {
-      return false;
-    } else {
-      return true;
-    }
-  }
-
+  /*
+  * Calculate how many chunks can fit the screen
+  */
   static calculatePerScreenRatio(): void {
     Chunk.perscreen.x = Math.ceil(Canvas.width / Chunk.chunksize);
     Chunk.perscreen.y = Math.ceil(Canvas.height / Chunk.chunksize);
   }
 
-  generateTiles(seed): void {
+  /*
+  * Generates the necessary tiles for the chunk
+  */
+  generate(seed): void {
     let r:number = 1;
     while (r <= Chunk.tilesperside) {
       let c = 1;
@@ -59,11 +53,8 @@ export class Chunk {
         if (islandnoise >= Sea.noise.min && islandnoise <= Sea.noise.max) {
           tile = Sea.getTile(r, c, islandnoise);
         } else {
-        console.log("x: " + x + ", y: " + y)
           let temp: number = Tile.generateNoise((x / Biome.tempsize), (y / Biome.tempsize), seed.biome.temp) * Biome.tempmax;
           let hum: number = Tile.generateNoise((x / Biome.humsize), (y / Biome.humsize), seed.biome.hum) * Biome.hummax;
-          console.log(seed);
-          console.log("temp: " + temp + ", hum: " + hum);
           let biome = this.getBiome(temp, hum);
           tile = biome.getTile(r, c);
         }
@@ -74,6 +65,9 @@ export class Chunk {
     }
   }
 
+  /*
+  * Returns the biome that matches the temperature and humidity noise given
+  */
   getBiome(temp: number, hum: number) {
     for (let biome in Biome.get) {
       let b = Biome.get[biome];
@@ -95,6 +89,7 @@ export class Chunk {
 
 export class World {
 
+  //all seeds for for the chunks / world generation
   seed = {
     island: 0,
     biome: {
@@ -102,23 +97,53 @@ export class World {
       hum: 0
     }
   };
+  //all the chunks that have been loaded
   chunks: any = {};
+  /*
+  * All the chunks that are on the screen.
+  * This will update when the player moves.
+  * Only these chunks will be drawn on the canvas, to prevent massive lag.
+  */
   onscreen: Array<string> = [];
 
+
+
+  /*
+  * On creation, calculate chunk per screen ratio and generate all 3 world seeds
+  * See: World.seed variable
+  */
   constructor() {
     Chunk.calculatePerScreenRatio();
     this.generateSeed();
-    this.generateChunk(0, 0);
   }
 
+  /*
+  * Pushes the chunk to the onscreen array.
+  * If chunk does not exist yet, it will automaticaly create one.
+  * See World.onscreen variable
+  */
   loadChunk(x: number, y:number) {
     if (this.chunkExists(x, y)) {
       if (this.onscreen.indexOf(World.coordinatesToString(x, y)) == -1) {
         this.onscreen.push(World.coordinatesToString(x, y));
       }
+    } else {
+      this.generateChunk(x, y);
     }
   }
 
+  /*
+  * Generate ALL the chunks that are currently on the screen.
+  * This should only be used when the game is started.
+  */
+  genChunksOnScreen(playerposx: number, playerposy: number) {
+    
+  }
+
+  /*
+  * Removes the chunk from the onscreen array.
+  * See World.onscreen variable
+  */
   unloadChunk(x: number, y:number) {
     let arrayindex: number = this.onscreen.indexOf(World.coordinatesToString(x, y));
     if (arrayindex > -1) {
@@ -126,7 +151,11 @@ export class World {
     }
   }
 
-  //load a bunch of chunks
+  /*
+  * Loads the "next" chunks when player moves.
+  * Example:
+  * If player moves up then it load all the chunks in the up direction
+  */
   loadChunksOnWalk(pos: Position, dir: Direction, playerposx: number, playerposy: number) {
     let indextop, indexbottom, x, y, unloadx, unloady;
     let halfy:number = Math.ceil(Chunk.perscreen.y / 2) + 1;
@@ -134,22 +163,22 @@ export class World {
     //might seem a bit backwards mut if we move on the x axis
     //we want to loop through on the y axis
     if (pos == Position.X) {
-      indextop = playerposy + halfy;
-      indexbottom = playerposy - halfy;
+      indextop = playerposy + halfy + 1;
+      indexbottom = playerposy - halfy - 1;
     } else if (pos == Position.Y) {
-      indextop = playerposx + halfx;
-      indexbottom = playerposx - halfy;
+      indextop = playerposx + halfx + 1;
+      indexbottom = playerposx - halfy - 1;
     }
     while (indextop >= indexbottom) {
       if (pos == Position.X) {
         y = indextop;
         unloady = indextop;
         if (dir == Direction.RIGHT) {
-          x = playerposx + halfx;
+          x = playerposx + halfx - 1;
           unloadx = playerposx - halfx - 1;
         }
         if (dir == Direction.LEFT) {
-          x = playerposx - halfx;
+          x = playerposx - halfx + 1;
           unloadx = playerposx + halfx + 1;
         }
       }
@@ -157,11 +186,11 @@ export class World {
         x = indextop;
         unloadx = indextop;
         if (dir == Direction.UP) {
-          y = playerposy + halfy;
+          y = playerposy + halfy - 1;
           unloady = playerposy - halfy - 1;
         }
         if (dir == Direction.DOWN) {
-          y = playerposy - halfy;
+          y = playerposy - halfy + 1;
           unloady = playerposy + halfy + 1;
         }
       }
@@ -171,6 +200,7 @@ export class World {
     }
   }
 
+  /* Creates a new chunk */
   generateChunk(x:number, y:number, direction?:number): void {
     let coords = this.calculateDirection(x, y, direction);
     if (!this.chunkExists(coords.x, coords.y)) {
@@ -181,16 +211,30 @@ export class World {
     }
   }
 
+  /*
+  * Checks if the chunk exists in the chunks variable.
+  * Returns: boolean
+  */
   chunkExists(x:number, y:number): boolean {
     return this.chunks[World.coordinatesToString(x, y)] != null;
   }
 
+  /*
+  * Returns a string version of the coordinates given.
+  * Example:
+  * -1, 4   ===   "m14"
+  * 0, -12  ===   "0m12"
+  */
   static coordinatesToString(x: number, y:number): string {
     let coords:string = x.toString() + y.toString();
     coords = coords.replace(/-/g, "m");
     return coords;
   }
 
+  /*
+  * Changes the coordinates to the direction given.
+  * Returns a object with 2 values: x and y
+  */
   calculateDirection(x: number, y: number, dir?: number) {
     switch (dir) {
       case Direction.UP:
@@ -211,32 +255,18 @@ export class World {
     return {"x": x, "y": y};
   }
 
+  /*
+  * Draws a single chunk
+  */
   drawChunk(chunk: Chunk) {
     let chunkpositionx:number = Canvas.center.x + (Chunk.chunksize * chunk.x) - (Chunk.chunksize / 2);
     let chunkpositiony:number = Canvas.center.y + (Chunk.chunksize * -chunk.y) - (Chunk.chunksize / 2);
     for (let tile of chunk.tiles) {
       let tilepositionx:number = chunkpositionx + (Tile.tilesize * (tile.x - 1)) - (Tile.tilesize / 2);
       let tilepositiony:number = chunkpositiony + (Tile.tilesize * -(tile.y)) - (Tile.tilesize / 2) + Chunk.chunksize;
-      Canvas.context.beginPath();
-      if (Debug.lines) {
-        Canvas.context.rect(tilepositionx, tilepositiony, Tile.tilesize, Tile.tilesize);
-        Canvas.context.strokeStyle = "rgba(255, 255, 255, 0.5)";
-        Canvas.context.stroke();
-      } else {
-        if (Settings.usetilecolor) {
-          Canvas.context.fillStyle = tile.color.getRGBA();
-          Canvas.context.fillRect(tilepositionx, tilepositiony, Tile.tilesize, Tile.tilesize);
-        } else {
-          Canvas.context.drawImage(tile.texture, tilepositionx, tilepositiony, Tile.tilesize, Tile.tilesize);
-        }
-      }
-      if (Debug.worldtext) {
-        Canvas.context.font = "10px sans-serif";
-        Canvas.context.fillStyle = "rgba(255, 255, 255, 0.5)";
-        Canvas.context.fillText("" + tile.x + ", " + tile.y, tilepositionx + 5, tilepositiony + 22);
-        Canvas.context.fillText("" + (tile.x + (chunk.x * Chunk.tilesperside)) + ", " + (tile.y + (chunk.y * Chunk.tilesperside)), tilepositionx + 5, tilepositiony + 32);
-      }
+      tile.draw(tilepositionx, tilepositiony);
     }
+    Canvas.context.beginPath();
     if (Debug.worldtext) {
       Canvas.context.beginPath();
       Canvas.context.font = "15px sans-serif";
@@ -251,6 +281,9 @@ export class World {
     }
   }
 
+  /*
+  * Generates all 3 seeds for the world generation noise functions
+  */
   generateSeed(): void {
     this.seed.island = rng(1, 65536);
     this.seed.biome.temp = rng(1, 65536);

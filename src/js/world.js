@@ -7,32 +7,25 @@ var tiles_1 = require("./tiles");
 var debug_1 = require("./debug");
 var biomes_1 = require("./biomes");
 var biomes_2 = require("./biomes");
-var settings_1 = require("./settings");
 var general_3 = require("./general");
 var Chunk = (function () {
     function Chunk(x, y, seed) {
         this.tiles = [];
         this.x = x;
         this.y = y;
-        this.generateTiles(seed);
+        this.generate(seed);
     }
-    Chunk.isOnScreen = function (chunk, playerx, playery) {
-        var xplus = Math.ceil(playerx + (Chunk.perscreen / 2));
-        var xminus = Math.floor(playerx - (Chunk.perscreen / 2));
-        var yplus = Math.ceil(playery + (Chunk.perscreen / 2));
-        var yminus = Math.floor(playery - (Chunk.perscreen / 2));
-        if (chunk.x > xplus || chunk.x < xminus || chunk.y > yplus || chunk.y < yminus) {
-            return false;
-        }
-        else {
-            return true;
-        }
-    };
+    /*
+    * Calculate how many chunks can fit the screen
+    */
     Chunk.calculatePerScreenRatio = function () {
         Chunk.perscreen.x = Math.ceil(canvas_1.Canvas.width / Chunk.chunksize);
         Chunk.perscreen.y = Math.ceil(canvas_1.Canvas.height / Chunk.chunksize);
     };
-    Chunk.prototype.generateTiles = function (seed) {
+    /*
+    * Generates the necessary tiles for the chunk
+    */
+    Chunk.prototype.generate = function (seed) {
         var r = 1;
         while (r <= Chunk.tilesperside) {
             var c = 1;
@@ -45,11 +38,8 @@ var Chunk = (function () {
                     tile = biomes_2.Sea.getTile(r, c, islandnoise);
                 }
                 else {
-                    console.log("x: " + x + ", y: " + y);
                     var temp = tiles_1.Tile.generateNoise((x / biomes_1.Biome.tempsize), (y / biomes_1.Biome.tempsize), seed.biome.temp) * biomes_1.Biome.tempmax;
                     var hum = tiles_1.Tile.generateNoise((x / biomes_1.Biome.humsize), (y / biomes_1.Biome.humsize), seed.biome.hum) * biomes_1.Biome.hummax;
-                    console.log(seed);
-                    console.log("temp: " + temp + ", hum: " + hum);
                     var biome = this.getBiome(temp, hum);
                     tile = biome.getTile(r, c);
                 }
@@ -59,6 +49,9 @@ var Chunk = (function () {
             r++;
         }
     };
+    /*
+    * Returns the biome that matches the temperature and humidity noise given
+    */
     Chunk.prototype.getBiome = function (temp, hum) {
         for (var biome in biomes_1.Biome.get) {
             var b = biomes_1.Biome.get[biome];
@@ -75,7 +68,12 @@ Chunk.loadsensitivity = 2;
 Chunk.perscreen = { x: 0, y: 0 };
 exports.Chunk = Chunk;
 var World = (function () {
+    /*
+    * On creation, calculate chunk per screen ratio and generate all 3 world seeds
+    * See: World.seed variable
+    */
     function World() {
+        //all seeds for for the chunks / world generation
         this.seed = {
             island: 0,
             biome: {
@@ -83,26 +81,53 @@ var World = (function () {
                 hum: 0
             }
         };
+        //all the chunks that have been loaded
         this.chunks = {};
+        /*
+        * All the chunks that are on the screen.
+        * This will update when the player moves.
+        * Only these chunks will be drawn on the canvas, to prevent massive lag.
+        */
         this.onscreen = [];
         Chunk.calculatePerScreenRatio();
         this.generateSeed();
-        this.generateChunk(0, 0);
     }
+    /*
+    * Pushes the chunk to the onscreen array.
+    * If chunk does not exist yet, it will automaticaly create one.
+    * See World.onscreen variable
+    */
     World.prototype.loadChunk = function (x, y) {
         if (this.chunkExists(x, y)) {
             if (this.onscreen.indexOf(World.coordinatesToString(x, y)) == -1) {
                 this.onscreen.push(World.coordinatesToString(x, y));
             }
         }
+        else {
+            this.generateChunk(x, y);
+        }
     };
+    /*
+    * Generate ALL the chunks that are currently on the screen.
+    * This should only be used when the game is started.
+    */
+    World.prototype.genChunksOnScreen = function (playerposx, playerposy) {
+    };
+    /*
+    * Removes the chunk from the onscreen array.
+    * See World.onscreen variable
+    */
     World.prototype.unloadChunk = function (x, y) {
         var arrayindex = this.onscreen.indexOf(World.coordinatesToString(x, y));
         if (arrayindex > -1) {
             this.onscreen.splice(arrayindex, 1);
         }
     };
-    //load a bunch of chunks
+    /*
+    * Loads the "next" chunks when player moves.
+    * Example:
+    * If player moves up then it load all the chunks in the up direction
+    */
     World.prototype.loadChunksOnWalk = function (pos, dir, playerposx, playerposy) {
         var indextop, indexbottom, x, y, unloadx, unloady;
         var halfy = Math.ceil(Chunk.perscreen.y / 2) + 1;
@@ -110,23 +135,23 @@ var World = (function () {
         //might seem a bit backwards mut if we move on the x axis
         //we want to loop through on the y axis
         if (pos == general_2.Position.X) {
-            indextop = playerposy + halfy;
-            indexbottom = playerposy - halfy;
+            indextop = playerposy + halfy + 1;
+            indexbottom = playerposy - halfy - 1;
         }
         else if (pos == general_2.Position.Y) {
-            indextop = playerposx + halfx;
-            indexbottom = playerposx - halfy;
+            indextop = playerposx + halfx + 1;
+            indexbottom = playerposx - halfy - 1;
         }
         while (indextop >= indexbottom) {
             if (pos == general_2.Position.X) {
                 y = indextop;
                 unloady = indextop;
                 if (dir == general_1.Direction.RIGHT) {
-                    x = playerposx + halfx;
+                    x = playerposx + halfx - 1;
                     unloadx = playerposx - halfx - 1;
                 }
                 if (dir == general_1.Direction.LEFT) {
-                    x = playerposx - halfx;
+                    x = playerposx - halfx + 1;
                     unloadx = playerposx + halfx + 1;
                 }
             }
@@ -134,11 +159,11 @@ var World = (function () {
                 x = indextop;
                 unloadx = indextop;
                 if (dir == general_1.Direction.UP) {
-                    y = playerposy + halfy;
+                    y = playerposy + halfy - 1;
                     unloady = playerposy - halfy - 1;
                 }
                 if (dir == general_1.Direction.DOWN) {
-                    y = playerposy - halfy;
+                    y = playerposy - halfy + 1;
                     unloady = playerposy + halfy + 1;
                 }
             }
@@ -147,6 +172,7 @@ var World = (function () {
             indextop--;
         }
     };
+    /* Creates a new chunk */
     World.prototype.generateChunk = function (x, y, direction) {
         var coords = this.calculateDirection(x, y, direction);
         if (!this.chunkExists(coords.x, coords.y)) {
@@ -156,14 +182,28 @@ var World = (function () {
             this.loadChunk(coords.x, coords.y);
         }
     };
+    /*
+    * Checks if the chunk exists in the chunks variable.
+    * Returns: boolean
+    */
     World.prototype.chunkExists = function (x, y) {
         return this.chunks[World.coordinatesToString(x, y)] != null;
     };
+    /*
+    * Returns a string version of the coordinates given.
+    * Example:
+    * -1, 4   ===   "m14"
+    * 0, -12  ===   "0m12"
+    */
     World.coordinatesToString = function (x, y) {
         var coords = x.toString() + y.toString();
         coords = coords.replace(/-/g, "m");
         return coords;
     };
+    /*
+    * Changes the coordinates to the direction given.
+    * Returns a object with 2 values: x and y
+    */
     World.prototype.calculateDirection = function (x, y, dir) {
         switch (dir) {
             case general_1.Direction.UP:
@@ -182,6 +222,9 @@ var World = (function () {
         }
         return { "x": x, "y": y };
     };
+    /*
+    * Draws a single chunk
+    */
     World.prototype.drawChunk = function (chunk) {
         var chunkpositionx = canvas_1.Canvas.center.x + (Chunk.chunksize * chunk.x) - (Chunk.chunksize / 2);
         var chunkpositiony = canvas_1.Canvas.center.y + (Chunk.chunksize * -chunk.y) - (Chunk.chunksize / 2);
@@ -189,28 +232,9 @@ var World = (function () {
             var tile = _a[_i];
             var tilepositionx = chunkpositionx + (tiles_1.Tile.tilesize * (tile.x - 1)) - (tiles_1.Tile.tilesize / 2);
             var tilepositiony = chunkpositiony + (tiles_1.Tile.tilesize * -(tile.y)) - (tiles_1.Tile.tilesize / 2) + Chunk.chunksize;
-            canvas_1.Canvas.context.beginPath();
-            if (debug_1.Debug.lines) {
-                canvas_1.Canvas.context.rect(tilepositionx, tilepositiony, tiles_1.Tile.tilesize, tiles_1.Tile.tilesize);
-                canvas_1.Canvas.context.strokeStyle = "rgba(255, 255, 255, 0.5)";
-                canvas_1.Canvas.context.stroke();
-            }
-            else {
-                if (settings_1.Settings.usetilecolor) {
-                    canvas_1.Canvas.context.fillStyle = tile.color.getRGBA();
-                    canvas_1.Canvas.context.fillRect(tilepositionx, tilepositiony, tiles_1.Tile.tilesize, tiles_1.Tile.tilesize);
-                }
-                else {
-                    canvas_1.Canvas.context.drawImage(tile.texture, tilepositionx, tilepositiony, tiles_1.Tile.tilesize, tiles_1.Tile.tilesize);
-                }
-            }
-            if (debug_1.Debug.worldtext) {
-                canvas_1.Canvas.context.font = "10px sans-serif";
-                canvas_1.Canvas.context.fillStyle = "rgba(255, 255, 255, 0.5)";
-                canvas_1.Canvas.context.fillText("" + tile.x + ", " + tile.y, tilepositionx + 5, tilepositiony + 22);
-                canvas_1.Canvas.context.fillText("" + (tile.x + (chunk.x * Chunk.tilesperside)) + ", " + (tile.y + (chunk.y * Chunk.tilesperside)), tilepositionx + 5, tilepositiony + 32);
-            }
+            tile.draw(tilepositionx, tilepositiony);
         }
+        canvas_1.Canvas.context.beginPath();
         if (debug_1.Debug.worldtext) {
             canvas_1.Canvas.context.beginPath();
             canvas_1.Canvas.context.font = "15px sans-serif";
@@ -224,6 +248,9 @@ var World = (function () {
             canvas_1.Canvas.context.stroke();
         }
     };
+    /*
+    * Generates all 3 seeds for the world generation noise functions
+    */
     World.prototype.generateSeed = function () {
         this.seed.island = general_3.rng(1, 65536);
         this.seed.biome.temp = general_3.rng(1, 65536);

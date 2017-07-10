@@ -1,5 +1,8 @@
 
 import { Color } from "./general";
+import { Settings } from "./settings";
+import { Canvas } from "./canvas";
+import { Debug } from "./debug";
 
 declare var noise;
 
@@ -31,6 +34,27 @@ export class Tile {
       return Math.abs(noise.simplex2(x, y));
     } else {
       return noise.simplex2(x, y);
+    }
+  }
+
+  draw(x: number, y: number) {
+    Canvas.context.beginPath();
+    if (Debug.lines) {
+      Canvas.context.rect(x, y, Tile.tilesize, Tile.tilesize);
+      Canvas.context.strokeStyle = this.color.getRGBA();
+      Canvas.context.stroke();
+    } else {
+      if (Settings.usetilecolor) {
+        Canvas.context.fillStyle = this.color.getRGBA();
+        Canvas.context.fillRect(x, y, Tile.tilesize, Tile.tilesize);
+      } else {
+        Canvas.context.drawImage(this.texture, x, y, Tile.tilesize, Tile.tilesize);
+      }
+    }
+    if (Debug.worldtext) {
+      Canvas.context.font = "10px sans-serif";
+      Canvas.context.fillStyle = "rgba(255, 255, 255, 0.5)";
+      Canvas.context.fillText("" + this.x + ", " + this.y, x + 5, y + 22);
     }
   }
 
