@@ -40,6 +40,7 @@ var Game = (function () {
     Game.start = function () {
         Game.world = new world_1.World();
         Game.player = new character_1.Player(1, "asd");
+        Game.world.genChunksOnScreen(Game.player.position.chunk.x, Game.player.position.chunk.y);
     };
     Game.getDebugLines = function () {
         var debugLines = [
@@ -90,7 +91,24 @@ var Game = (function () {
         Game.comparePositions(oldPosition, newPosition);
         Game.updateScreen();
     };
+    /*
+    * Updates the mouse position in relation to the canvas.
+    */
+    Game.updateMousePosition = function (e) {
+        e = e || window.event;
+        Game.mouse.world.x = -(canvas_1.Canvas.center.x - e.pageX) + (tiles_1.Tile.tilesize / 2);
+        Game.mouse.world.y = (canvas_1.Canvas.center.x - e.pageY);
+        Game.mouse.chunk.x = Math.round((Game.mouse.world.x) / world_2.Chunk.chunksize);
+        Game.mouse.chunk.y = Math.round((Game.mouse.world.y - (world_2.Chunk.chunksize / 2)) / world_2.Chunk.chunksize);
+        console.log(Game.mouse.chunk);
+        console.log(Game.player.position.world);
+    };
     return Game;
 }());
 Game.key = {};
+Game.mouse = {
+    world: { x: 0, y: 0 },
+    chunk: { x: 0, y: 0 },
+    tile: { x: 0, y: 0 }
+};
 exports.Game = Game;

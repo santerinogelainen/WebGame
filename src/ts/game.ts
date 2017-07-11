@@ -12,6 +12,11 @@ export class Game {
   static world: World;
   static player: Player;
   static key = {};
+  static mouse: any = {
+    world: {x: 0, y: 0},
+    chunk: {x: 0, y: 0},
+    tile: {x: 0, y: 0}
+  };
 
   static updateResolution() {
     Canvas.updateResolution();
@@ -41,6 +46,7 @@ export class Game {
   static start() {
     Game.world = new World();
     Game.player = new Player(1, "asd");
+    Game.world.genChunksOnScreen(Game.player.position.chunk.x, Game.player.position.chunk.y);
   }
 
   static getDebugLines(): Array<string> {
@@ -93,6 +99,19 @@ export class Game {
     let newPosition = {x: Game.player.position.chunk.x, y: Game.player.position.chunk.y};
     Game.comparePositions(oldPosition, newPosition);
     Game.updateScreen();
+  }
+
+  /*
+  * Updates the mouse position in relation to the canvas.
+  */
+  static updateMousePosition(e) {
+    e = e || window.event;
+    Game.mouse.world.x = -(Canvas.center.x - e.pageX) + (Tile.tilesize / 2);
+    Game.mouse.world.y = (Canvas.center.x - e.pageY);
+    Game.mouse.chunk.x = Math.round((Game.mouse.world.x) / Chunk.chunksize);
+    Game.mouse.chunk.y = Math.round((Game.mouse.world.y - (Chunk.chunksize / 2)) / Chunk.chunksize);
+    console.log(Game.mouse.chunk);
+    console.log(Game.player.position.world);
   }
 
 }

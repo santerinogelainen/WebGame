@@ -12,6 +12,7 @@ window.onload = () => {
   Canvas.init();
   Canvas.setBackground(new Color(0, 0, 0, 1));
   Game.start();
+  Canvas.element.onmousemove = Game.updateMousePosition;
 
   window.requestAnimationFrame(Game.loop);
 

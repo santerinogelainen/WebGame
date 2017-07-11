@@ -137,7 +137,21 @@ export class World {
   * This should only be used when the game is started.
   */
   genChunksOnScreen(playerposx: number, playerposy: number) {
-    
+    let x, y, stopx, stopy;
+    let halfy:number = Math.ceil(Chunk.perscreen.y / 2) + 1;
+    let halfx:number = Math.ceil(Chunk.perscreen.x / 2) + 1;
+    x = playerposx - halfx;
+    stopx = playerposx + halfx;
+    y = playerposy - halfy;
+    stopy = playerposy + halfy;
+    while (x <= stopx) {
+      while (y <= stopy) {
+        this.loadChunk(x, y);
+        y++;
+      }
+      y = playerposy - halfy;
+      x++;
+    }
   }
 
   /*

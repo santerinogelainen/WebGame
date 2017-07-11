@@ -24,7 +24,7 @@ export class Player extends Character {
   static size:number = 20;
   static speed:number = 3;
   moving: boolean = false;
-  position: any ={
+  position: any = {
     world: {x: 0, y: 0},
     chunk: {x: 0, y: 0},
     tile: {x: Math.ceil(Chunk.tilesperside / 2), y: Math.ceil(Chunk.tilesperside / 2)},

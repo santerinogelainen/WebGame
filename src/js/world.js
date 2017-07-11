@@ -112,6 +112,21 @@ var World = (function () {
     * This should only be used when the game is started.
     */
     World.prototype.genChunksOnScreen = function (playerposx, playerposy) {
+        var x, y, stopx, stopy;
+        var halfy = Math.ceil(Chunk.perscreen.y / 2) + 1;
+        var halfx = Math.ceil(Chunk.perscreen.x / 2) + 1;
+        x = playerposx - halfx;
+        stopx = playerposx + halfx;
+        y = playerposy - halfy;
+        stopy = playerposy + halfy;
+        while (x <= stopx) {
+            while (y <= stopy) {
+                this.loadChunk(x, y);
+                y++;
+            }
+            y = playerposy - halfy;
+            x++;
+        }
     };
     /*
     * Removes the chunk from the onscreen array.
