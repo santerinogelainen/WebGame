@@ -16,7 +16,7 @@ declare var noise;
 
 export class Chunk {
 
-  tiles: Array<Tile> = [];
+  tiles = {};
   static tilesperside:number = 7; //USE ONLY NUMBERS WHERE % 2 = 1;
   static chunksize:number = Chunk.tilesperside * Tile.tilesize;
   static loadsensitivity:number = 2;
@@ -58,7 +58,8 @@ export class Chunk {
           let biome = this.getBiome(temp, hum);
           tile = biome.getTile(r, c);
         }
-        this.tiles.push(tile);
+        let name: string = World.coordinatesToString(r, c);
+        this.tiles[name] = tile;
         c++;
       }
       r++;
@@ -219,7 +220,6 @@ export class World {
     let coords = this.calculateDirection(x, y, direction);
     if (!this.chunkExists(coords.x, coords.y)) {
       let chunk = new Chunk(coords.x, coords.y, this.seed);
-      this.drawChunk(chunk);
       this.chunks[World.coordinatesToString(coords.x, coords.y)] = chunk;
       this.loadChunk(coords.x, coords.y);
     }
@@ -272,15 +272,19 @@ export class World {
   /*
   * Draws a single chunk
   */
-  drawChunk(chunk: Chunk) {
+  drawChunk(chunk: Chunk, hover) {
+    let c: string = World.coordinatesToString(chunk.x, chunk.y);
     let chunkpositionx:number = Canvas.center.x + (Chunk.chunksize * chunk.x) - (Chunk.chunksize / 2);
     let chunkpositiony:number = Canvas.center.y + (Chunk.chunksize * -chunk.y) - (Chunk.chunksize / 2);
-    for (let tile of chunk.tiles) {
-      let tilepositionx:number = chunkpositionx + (Tile.tilesize * (tile.x - 1)) - (Tile.tilesize / 2);
-      let tilepositiony:number = chunkpositiony + (Tile.tilesize * -(tile.y)) - (Tile.tilesize / 2) + Chunk.chunksize;
-      tile.draw(tilepositionx, tilepositiony);
+    for (let tile in chunk.tiles) {
+      let t:Tile = chunk.tiles[tile];
+      let tilepositionx:number = chunkpositionx + (Tile.tilesize * (t.x - 1)) - (Tile.tilesize / 2);
+      let tilepositiony:number = chunkpositiony + (Tile.tilesize * -(t.y)) - (Tile.tilesize / 2) + Chunk.chunksize;
+      t.draw(tilepositionx, tilepositiony);
+      if (c == hover.chunk && tile == hover.tile) {
+        t.drawStroke(tilepositionx, tilepositiony);
+      }
     }
-    Canvas.context.beginPath();
     if (Debug.worldtext) {
       Canvas.context.beginPath();
       Canvas.context.font = "15px sans-serif";

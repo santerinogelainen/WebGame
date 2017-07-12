@@ -58,6 +58,14 @@ export class Tile {
     }
   }
 
+  drawStroke(x: number, y: number) {
+    console.log("asd");
+    Canvas.context.beginPath();
+    Canvas.context.lineWidth = Settings.tilehoverlinewidth;
+    Canvas.context.strokeStyle = Settings.tilehovercolor.getRGBA();
+    Canvas.context.strokeRect(x, y, Tile.tilesize, Tile.tilesize);
+  }
+
 }
 
 export class Grass extends Tile {

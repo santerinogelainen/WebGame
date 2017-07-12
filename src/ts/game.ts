@@ -17,6 +17,7 @@ export class Game {
     chunk: {x: 0, y: 0},
     tile: {x: 0, y: 0}
   };
+  static hover = {chunk: "", tile: ""};
 
   static updateResolution() {
     Canvas.updateResolution();
@@ -29,7 +30,7 @@ export class Game {
     Canvas.updateBackground();
     //update each chunk
     for (let chunk of Game.world.onscreen) {
-      Game.world.drawChunk(Game.world.chunks[chunk]);
+      Game.world.drawChunk(Game.world.chunks[chunk], Game.hover);
     }
     //update character
     if (updateResolution) {
@@ -106,12 +107,24 @@ export class Game {
   */
   static updateMousePosition(e) {
     e = e || window.event;
+    let oldPosition = {x: Game.mouse.tile.x, y: Game.mouse.tile.y};
     Game.mouse.world.x = -(Canvas.center.x - e.pageX) + (Tile.tilesize / 2);
-    Game.mouse.world.y = (Canvas.center.x - e.pageY);
+    Game.mouse.world.y = (Canvas.center.y - e.pageY) - (Tile.tilesize / 2);
     Game.mouse.chunk.x = Math.round((Game.mouse.world.x) / Chunk.chunksize);
-    Game.mouse.chunk.y = Math.round((Game.mouse.world.y - (Chunk.chunksize / 2)) / Chunk.chunksize);
-    console.log(Game.mouse.chunk);
-    console.log(Game.player.position.world);
+    Game.mouse.chunk.y = Math.round((Game.mouse.world.y) / Chunk.chunksize);
+    Game.mouse.tile.x = Math.floor(((Game.mouse.world.x + (Chunk.chunksize / 2) + Tile.tilesize) - (Game.mouse.chunk.x * Chunk.chunksize)) / Tile.tilesize);
+    Game.mouse.tile.y = Math.floor(((Game.mouse.world.y + (Chunk.chunksize / 2) + Tile.tilesize) - (Game.mouse.chunk.y * Chunk.chunksize)) / Tile.tilesize);
+    let newPosition = {x: Game.mouse.tile.x, y: Game.mouse.tile.y};
+    if (newPosition.x != oldPosition.x || newPosition.y != oldPosition.y) {
+      Game.updateHoverTile();
+    }
+  }
+
+  static updateHoverTile() {
+    let chunk: string = World.coordinatesToString(Game.mouse.chunk.x, Game.mouse.chunk.y);
+    let tile: string = World.coordinatesToString(Game.mouse.tile.x, Game.mouse.tile.y);
+    Game.hover.chunk = chunk;
+    Game.hover.tile = tile;
   }
 
 }

@@ -10,7 +10,7 @@ var biomes_2 = require("./biomes");
 var general_3 = require("./general");
 var Chunk = (function () {
     function Chunk(x, y, seed) {
-        this.tiles = [];
+        this.tiles = {};
         this.x = x;
         this.y = y;
         this.generate(seed);
@@ -43,7 +43,8 @@ var Chunk = (function () {
                     var biome = this.getBiome(temp, hum);
                     tile = biome.getTile(r, c);
                 }
-                this.tiles.push(tile);
+                var name_1 = World.coordinatesToString(r, c);
+                this.tiles[name_1] = tile;
                 c++;
             }
             r++;
@@ -192,7 +193,6 @@ var World = (function () {
         var coords = this.calculateDirection(x, y, direction);
         if (!this.chunkExists(coords.x, coords.y)) {
             var chunk = new Chunk(coords.x, coords.y, this.seed);
-            this.drawChunk(chunk);
             this.chunks[World.coordinatesToString(coords.x, coords.y)] = chunk;
             this.loadChunk(coords.x, coords.y);
         }
@@ -240,16 +240,19 @@ var World = (function () {
     /*
     * Draws a single chunk
     */
-    World.prototype.drawChunk = function (chunk) {
+    World.prototype.drawChunk = function (chunk, hover) {
+        var c = World.coordinatesToString(chunk.x, chunk.y);
         var chunkpositionx = canvas_1.Canvas.center.x + (Chunk.chunksize * chunk.x) - (Chunk.chunksize / 2);
         var chunkpositiony = canvas_1.Canvas.center.y + (Chunk.chunksize * -chunk.y) - (Chunk.chunksize / 2);
-        for (var _i = 0, _a = chunk.tiles; _i < _a.length; _i++) {
-            var tile = _a[_i];
-            var tilepositionx = chunkpositionx + (tiles_1.Tile.tilesize * (tile.x - 1)) - (tiles_1.Tile.tilesize / 2);
-            var tilepositiony = chunkpositiony + (tiles_1.Tile.tilesize * -(tile.y)) - (tiles_1.Tile.tilesize / 2) + Chunk.chunksize;
-            tile.draw(tilepositionx, tilepositiony);
+        for (var tile in chunk.tiles) {
+            var t = chunk.tiles[tile];
+            var tilepositionx = chunkpositionx + (tiles_1.Tile.tilesize * (t.x - 1)) - (tiles_1.Tile.tilesize / 2);
+            var tilepositiony = chunkpositiony + (tiles_1.Tile.tilesize * -(t.y)) - (tiles_1.Tile.tilesize / 2) + Chunk.chunksize;
+            t.draw(tilepositionx, tilepositiony);
+            if (c == hover.chunk && tile == hover.tile) {
+                t.drawStroke(tilepositionx, tilepositiony);
+            }
         }
-        canvas_1.Canvas.context.beginPath();
         if (debug_1.Debug.worldtext) {
             canvas_1.Canvas.context.beginPath();
             canvas_1.Canvas.context.font = "15px sans-serif";

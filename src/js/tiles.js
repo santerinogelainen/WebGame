@@ -59,6 +59,13 @@ var Tile = (function () {
             canvas_1.Canvas.context.fillText("" + this.x + ", " + this.y, x + 5, y + 22);
         }
     };
+    Tile.prototype.drawStroke = function (x, y) {
+        console.log("asd");
+        canvas_1.Canvas.context.beginPath();
+        canvas_1.Canvas.context.lineWidth = settings_1.Settings.tilehoverlinewidth;
+        canvas_1.Canvas.context.strokeStyle = settings_1.Settings.tilehovercolor.getRGBA();
+        canvas_1.Canvas.context.strokeRect(x, y, Tile.tilesize, Tile.tilesize);
+    };
     return Tile;
 }());
 Tile.tilesize = 40;

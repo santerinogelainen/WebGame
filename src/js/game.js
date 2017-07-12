@@ -23,7 +23,7 @@ var Game = (function () {
         //update each chunk
         for (var _i = 0, _a = Game.world.onscreen; _i < _a.length; _i++) {
             var chunk = _a[_i];
-            Game.world.drawChunk(Game.world.chunks[chunk]);
+            Game.world.drawChunk(Game.world.chunks[chunk], Game.hover);
         }
         //update character
         if (updateResolution) {
@@ -96,12 +96,23 @@ var Game = (function () {
     */
     Game.updateMousePosition = function (e) {
         e = e || window.event;
+        var oldPosition = { x: Game.mouse.tile.x, y: Game.mouse.tile.y };
         Game.mouse.world.x = -(canvas_1.Canvas.center.x - e.pageX) + (tiles_1.Tile.tilesize / 2);
-        Game.mouse.world.y = (canvas_1.Canvas.center.x - e.pageY);
+        Game.mouse.world.y = (canvas_1.Canvas.center.y - e.pageY) - (tiles_1.Tile.tilesize / 2);
         Game.mouse.chunk.x = Math.round((Game.mouse.world.x) / world_2.Chunk.chunksize);
-        Game.mouse.chunk.y = Math.round((Game.mouse.world.y - (world_2.Chunk.chunksize / 2)) / world_2.Chunk.chunksize);
-        console.log(Game.mouse.chunk);
-        console.log(Game.player.position.world);
+        Game.mouse.chunk.y = Math.round((Game.mouse.world.y) / world_2.Chunk.chunksize);
+        Game.mouse.tile.x = Math.floor(((Game.mouse.world.x + (world_2.Chunk.chunksize / 2) + tiles_1.Tile.tilesize) - (Game.mouse.chunk.x * world_2.Chunk.chunksize)) / tiles_1.Tile.tilesize);
+        Game.mouse.tile.y = Math.floor(((Game.mouse.world.y + (world_2.Chunk.chunksize / 2) + tiles_1.Tile.tilesize) - (Game.mouse.chunk.y * world_2.Chunk.chunksize)) / tiles_1.Tile.tilesize);
+        var newPosition = { x: Game.mouse.tile.x, y: Game.mouse.tile.y };
+        if (newPosition.x != oldPosition.x || newPosition.y != oldPosition.y) {
+            Game.updateHoverTile();
+        }
+    };
+    Game.updateHoverTile = function () {
+        var chunk = world_1.World.coordinatesToString(Game.mouse.chunk.x, Game.mouse.chunk.y);
+        var tile = world_1.World.coordinatesToString(Game.mouse.tile.x, Game.mouse.tile.y);
+        Game.hover.chunk = chunk;
+        Game.hover.tile = tile;
     };
     return Game;
 }());
@@ -111,4 +122,5 @@ Game.mouse = {
     chunk: { x: 0, y: 0 },
     tile: { x: 0, y: 0 }
 };
+Game.hover = { chunk: "", tile: "" };
 exports.Game = Game;
