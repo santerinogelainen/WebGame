@@ -1,7 +1,7 @@
 import { Position as Pos } from "./general";
 import { Canvas } from "./canvas";
-import { Chunk } from "./world";
-import { Tile } from "./tiles";
+import { Chunk } from "./chunk";
+import { Tile } from "./tile";
 
 class Character {
   id: number;
@@ -29,6 +29,11 @@ export class Player extends Character {
     chunk: {x: 0, y: 0},
     tile: {x: Math.ceil(Chunk.tilesperside / 2), y: Math.ceil(Chunk.tilesperside / 2)},
     screen: {x: 0, y: 0}
+  };
+  static mouse: any = {
+    world: {x: 0, y: 0},
+    chunk: {x: 0, y: 0},
+    tile: {x: 0, y: 0}
   };
 
   constructor(id: number, name:string) {
@@ -84,6 +89,25 @@ export class Player extends Character {
       Canvas.center.x -= speed;
       this.position.world.x += speed;
       this.updatePosition(Pos.X);
+    }
+  }
+
+  /*
+  * Updates the mouse position in relation to the canvas.
+  */
+  updateMousePosition(e) {
+    e = e || window.event;
+    let oldPosition = {x: Player.mouse.tile.x, y: Player.mouse.tile.y};
+    Player.mouse.world.x = -(Canvas.center.x - e.pageX) + (Tile.tilesize / 2);
+    Player.mouse.world.y = (Canvas.center.y - e.pageY) - (Tile.tilesize / 2);
+    Player.mouse.chunk.x = Math.round((Player.mouse.world.x) / Chunk.chunksize);
+    Player.mouse.chunk.y = Math.round((Player.mouse.world.y) / Chunk.chunksize);
+    Player.mouse.tile.x = Math.floor(((Player.mouse.world.x + (Chunk.chunksize / 2) + Tile.tilesize) - (Player.mouse.chunk.x * Chunk.chunksize)) / Tile.tilesize);
+    Player.mouse.tile.y = Math.floor(((Player.mouse.world.y + (Chunk.chunksize / 2) + Tile.tilesize) - (Player.mouse.chunk.y * Chunk.chunksize)) / Tile.tilesize);
+    let newPosition = {x: Player.mouse.tile.x, y: Player.mouse.tile.y};
+    if (newPosition.x != oldPosition.x || newPosition.y != oldPosition.y) {
+      Chunk.updateHover(Player.mouse.chunk.x, Player.mouse.chunk.y);
+      Tile.updateHover(Player.mouse.tile.x, Player.mouse.tile.y);
     }
   }
 

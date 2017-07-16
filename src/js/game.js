@@ -3,17 +3,18 @@ exports.__esModule = true;
 var world_1 = require("./world");
 var general_1 = require("./general");
 var general_2 = require("./general");
-var world_2 = require("./world");
-var tiles_1 = require("./tiles");
+var chunk_1 = require("./chunk");
+var tile_1 = require("./tile");
 var character_1 = require("./character");
 var canvas_1 = require("./canvas");
 var debug_1 = require("./debug");
+var tiletip_1 = require("./tiletip");
 var Game = (function () {
     function Game() {
     }
     Game.updateResolution = function () {
         canvas_1.Canvas.updateResolution();
-        world_2.Chunk.calculatePerScreenRatio();
+        chunk_1.Chunk.calculatePerScreenRatio();
         Game.updateScreen(true);
     };
     Game.updateScreen = function (updateResolution) {
@@ -23,7 +24,7 @@ var Game = (function () {
         //update each chunk
         for (var _i = 0, _a = Game.world.onscreen; _i < _a.length; _i++) {
             var chunk = _a[_i];
-            Game.world.drawChunk(Game.world.chunks[chunk], Game.hover);
+            Game.world.drawChunk(Game.world.chunks[chunk]);
         }
         //update character
         if (updateResolution) {
@@ -35,6 +36,10 @@ var Game = (function () {
         //debug
         if (debug_1.Debug.on) {
             debug_1.Debug.draw(Game.getDebugLines());
+        }
+        //update menus etc
+        if (Game.world.chunks[chunk_1.Chunk.hover] != null) {
+            tiletip_1.Tiletip.draw(Game.world.chunks[chunk_1.Chunk.hover].tiles[tile_1.Tile.hover]);
         }
     };
     Game.start = function () {
@@ -49,9 +54,9 @@ var Game = (function () {
             "World position: x=" + Game.player.position.world.x + " y=" + Game.player.position.world.y,
             "Chunk position: x=" + Game.player.position.chunk.x + " y=" + Game.player.position.chunk.y,
             "Tile position: x=" + Game.player.position.tile.x + " y=" + Game.player.position.tile.y,
-            "Tiles per chunk (side): " + world_2.Chunk.tilesperside,
-            "Chunk size: " + world_2.Chunk.chunksize,
-            "Tile size: " + tiles_1.Tile.tilesize
+            "Tiles per chunk (side): " + chunk_1.Chunk.tilesperside,
+            "Chunk size: " + chunk_1.Chunk.chunksize,
+            "Tile size: " + tile_1.Tile.tilesize
         ];
         return debugLines;
     };
@@ -91,36 +96,7 @@ var Game = (function () {
         Game.comparePositions(oldPosition, newPosition);
         Game.updateScreen();
     };
-    /*
-    * Updates the mouse position in relation to the canvas.
-    */
-    Game.updateMousePosition = function (e) {
-        e = e || window.event;
-        var oldPosition = { x: Game.mouse.tile.x, y: Game.mouse.tile.y };
-        Game.mouse.world.x = -(canvas_1.Canvas.center.x - e.pageX) + (tiles_1.Tile.tilesize / 2);
-        Game.mouse.world.y = (canvas_1.Canvas.center.y - e.pageY) - (tiles_1.Tile.tilesize / 2);
-        Game.mouse.chunk.x = Math.round((Game.mouse.world.x) / world_2.Chunk.chunksize);
-        Game.mouse.chunk.y = Math.round((Game.mouse.world.y) / world_2.Chunk.chunksize);
-        Game.mouse.tile.x = Math.floor(((Game.mouse.world.x + (world_2.Chunk.chunksize / 2) + tiles_1.Tile.tilesize) - (Game.mouse.chunk.x * world_2.Chunk.chunksize)) / tiles_1.Tile.tilesize);
-        Game.mouse.tile.y = Math.floor(((Game.mouse.world.y + (world_2.Chunk.chunksize / 2) + tiles_1.Tile.tilesize) - (Game.mouse.chunk.y * world_2.Chunk.chunksize)) / tiles_1.Tile.tilesize);
-        var newPosition = { x: Game.mouse.tile.x, y: Game.mouse.tile.y };
-        if (newPosition.x != oldPosition.x || newPosition.y != oldPosition.y) {
-            Game.updateHoverTile();
-        }
-    };
-    Game.updateHoverTile = function () {
-        var chunk = world_1.World.coordinatesToString(Game.mouse.chunk.x, Game.mouse.chunk.y);
-        var tile = world_1.World.coordinatesToString(Game.mouse.tile.x, Game.mouse.tile.y);
-        Game.hover.chunk = chunk;
-        Game.hover.tile = tile;
-    };
     return Game;
 }());
 Game.key = {};
-Game.mouse = {
-    world: { x: 0, y: 0 },
-    chunk: { x: 0, y: 0 },
-    tile: { x: 0, y: 0 }
-};
-Game.hover = { chunk: "", tile: "" };
 exports.Game = Game;

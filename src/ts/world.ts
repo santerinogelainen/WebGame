@@ -1,92 +1,13 @@
 import { Canvas } from "./canvas";
 import { Direction } from "./general";
 import { Position } from "./general";
-import { Tile } from "./tiles";
-import { Grass } from "./tiles";
+import { Tile } from "./tile";
 import { Debug } from "./debug";
-import { Biome } from "./biomes";
-import { Sea } from "./biomes";
 import { Settings } from "./settings";
+import { Chunk } from "./chunk";
 import { rng } from "./general";
+import { coordinatesToString } from "./general";
 declare var noise;
-
-
-
-
-
-export class Chunk {
-
-  tiles = {};
-  static tilesperside:number = 7; //USE ONLY NUMBERS WHERE % 2 = 1;
-  static chunksize:number = Chunk.tilesperside * Tile.tilesize;
-  static loadsensitivity:number = 2;
-  static perscreen:any = {x: 0, y: 0};
-  x: number;
-  y: number;
-
-  constructor(x:number, y: number, seed) {
-    this.x = x;
-    this.y = y;
-    this.generate(seed);
-  }
-
-  /*
-  * Calculate how many chunks can fit the screen
-  */
-  static calculatePerScreenRatio(): void {
-    Chunk.perscreen.x = Math.ceil(Canvas.width / Chunk.chunksize);
-    Chunk.perscreen.y = Math.ceil(Canvas.height / Chunk.chunksize);
-  }
-
-  /*
-  * Generates the necessary tiles for the chunk
-  */
-  generate(seed): void {
-    let r:number = 1;
-    while (r <= Chunk.tilesperside) {
-      let c = 1;
-      while (c <= Chunk.tilesperside) {
-        let tile;
-        let x = r + (this.x * Chunk.tilesperside);
-        let y = c + (this.y * Chunk.tilesperside);
-        let islandnoise = Tile.generateNoise((x / Biome.islandsize), (y / Biome.islandsize), seed.island, true) * Biome.islandmax;
-        if (islandnoise >= Sea.noise.min && islandnoise <= Sea.noise.max) {
-          tile = Sea.getTile(r, c, islandnoise);
-        } else {
-          let temp: number = Tile.generateNoise((x / Biome.tempsize), (y / Biome.tempsize), seed.biome.temp) * Biome.tempmax;
-          let hum: number = Tile.generateNoise((x / Biome.humsize), (y / Biome.humsize), seed.biome.hum) * Biome.hummax;
-          let biome = this.getBiome(temp, hum);
-          tile = biome.getTile(r, c);
-        }
-        let name: string = World.coordinatesToString(r, c);
-        this.tiles[name] = tile;
-        c++;
-      }
-      r++;
-    }
-  }
-
-  /*
-  * Returns the biome that matches the temperature and humidity noise given
-  */
-  getBiome(temp: number, hum: number) {
-    for (let biome in Biome.get) {
-      let b = Biome.get[biome];
-      if ((temp >= b.temperature.min && temp <= b.temperature.max) && (hum >= b.humidity.min && hum <= b.humidity.max)) {
-        return b;
-      }
-    }
-  }
-}
-
-
-
-
-
-
-
-
-
 
 export class World {
 
@@ -125,8 +46,8 @@ export class World {
   */
   loadChunk(x: number, y:number) {
     if (this.chunkExists(x, y)) {
-      if (this.onscreen.indexOf(World.coordinatesToString(x, y)) == -1) {
-        this.onscreen.push(World.coordinatesToString(x, y));
+      if (this.onscreen.indexOf(coordinatesToString(x, y)) == -1) {
+        this.onscreen.push(coordinatesToString(x, y));
       }
     } else {
       this.generateChunk(x, y);
@@ -160,7 +81,7 @@ export class World {
   * See World.onscreen variable
   */
   unloadChunk(x: number, y:number) {
-    let arrayindex: number = this.onscreen.indexOf(World.coordinatesToString(x, y));
+    let arrayindex: number = this.onscreen.indexOf(coordinatesToString(x, y));
     if (arrayindex > -1) {
       this.onscreen.splice(arrayindex, 1);
     }
@@ -220,7 +141,7 @@ export class World {
     let coords = this.calculateDirection(x, y, direction);
     if (!this.chunkExists(coords.x, coords.y)) {
       let chunk = new Chunk(coords.x, coords.y, this.seed);
-      this.chunks[World.coordinatesToString(coords.x, coords.y)] = chunk;
+      this.chunks[coordinatesToString(coords.x, coords.y)] = chunk;
       this.loadChunk(coords.x, coords.y);
     }
   }
@@ -230,19 +151,7 @@ export class World {
   * Returns: boolean
   */
   chunkExists(x:number, y:number): boolean {
-    return this.chunks[World.coordinatesToString(x, y)] != null;
-  }
-
-  /*
-  * Returns a string version of the coordinates given.
-  * Example:
-  * -1, 4   ===   "m14"
-  * 0, -12  ===   "0m12"
-  */
-  static coordinatesToString(x: number, y:number): string {
-    let coords:string = x.toString() + y.toString();
-    coords = coords.replace(/-/g, "m");
-    return coords;
+    return this.chunks[coordinatesToString(x, y)] != null;
   }
 
   /*
@@ -272,17 +181,18 @@ export class World {
   /*
   * Draws a single chunk
   */
-  drawChunk(chunk: Chunk, hover) {
-    let c: string = World.coordinatesToString(chunk.x, chunk.y);
+  drawChunk(chunk: Chunk) {
+    let c: string = coordinatesToString(chunk.x, chunk.y);
     let chunkpositionx:number = Canvas.center.x + (Chunk.chunksize * chunk.x) - (Chunk.chunksize / 2);
     let chunkpositiony:number = Canvas.center.y + (Chunk.chunksize * -chunk.y) - (Chunk.chunksize / 2);
     for (let tile in chunk.tiles) {
       let t:Tile = chunk.tiles[tile];
       let tilepositionx:number = chunkpositionx + (Tile.tilesize * (t.x - 1)) - (Tile.tilesize / 2);
       let tilepositiony:number = chunkpositiony + (Tile.tilesize * -(t.y)) - (Tile.tilesize / 2) + Chunk.chunksize;
-      t.draw(tilepositionx, tilepositiony);
-      if (c == hover.chunk && tile == hover.tile) {
-        t.drawStroke(tilepositionx, tilepositiony);
+      if (c == Chunk.hover) {
+        t.draw(tilepositionx, tilepositiony, true, tile);
+      } else {
+        t.draw(tilepositionx, tilepositiony, false, tile);
       }
     }
     if (Debug.worldtext) {

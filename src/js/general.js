@@ -13,6 +13,18 @@ var Position;
     Position[Position["Y"] = 1] = "Y";
     Position[Position["Z"] = 2] = "Z";
 })(Position = exports.Position || (exports.Position = {}));
+var HorizontalAlign;
+(function (HorizontalAlign) {
+    HorizontalAlign[HorizontalAlign["LEFT"] = 0] = "LEFT";
+    HorizontalAlign[HorizontalAlign["CENTER"] = 1] = "CENTER";
+    HorizontalAlign[HorizontalAlign["RIGHT"] = 2] = "RIGHT";
+})(HorizontalAlign = exports.HorizontalAlign || (exports.HorizontalAlign = {}));
+var VerticalAlign;
+(function (VerticalAlign) {
+    VerticalAlign[VerticalAlign["TOP"] = 0] = "TOP";
+    VerticalAlign[VerticalAlign["MIDDLE"] = 1] = "MIDDLE";
+    VerticalAlign[VerticalAlign["BOTTOM"] = 2] = "BOTTOM";
+})(VerticalAlign = exports.VerticalAlign || (exports.VerticalAlign = {}));
 function rng(min, max) {
     return Math.floor(Math.random() * (max - min + 1) + min);
 }
@@ -22,11 +34,28 @@ var Color = (function () {
         this.r = r;
         this.g = g;
         this.b = b;
-        this.a = a;
+        if (a != null) {
+            this.a = a;
+        }
+        else {
+            this.a = 1;
+        }
     }
-    Color.prototype.getRGBA = function () {
+    Color.prototype.toRGBA = function () {
         return "rgba(" + this.r + ", " + this.g + ", " + this.b + ", " + this.a + ")";
     };
     return Color;
 }());
 exports.Color = Color;
+/*
+* Returns a string version of the coordinates given.
+* Example:
+* -1, 4   ===   "m14"
+* 0, -12  ===   "0m12"
+*/
+function coordinatesToString(x, y) {
+    var coords = x.toString() + y.toString();
+    coords = coords.replace(/-/g, "m");
+    return coords;
+}
+exports.coordinatesToString = coordinatesToString;

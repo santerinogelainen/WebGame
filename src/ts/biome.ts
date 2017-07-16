@@ -1,5 +1,5 @@
 
-import * as tiles from "./tiles";
+import * as tiles from "./tile";
 
 interface Noise {
   min: number,

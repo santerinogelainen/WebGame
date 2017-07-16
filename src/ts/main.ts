@@ -1,7 +1,7 @@
 
 import { Canvas } from "./canvas";
-import { Chunk } from "./world";
-import { Tile } from "./tiles";
+import { Chunk } from "./chunk";
+import { Tile } from "./tile";
 import { Direction } from "./general";
 import { Color } from "./general";
 import { Game } from "./game";
@@ -12,7 +12,7 @@ window.onload = () => {
   Canvas.init();
   Canvas.setBackground(new Color(0, 0, 0, 1));
   Game.start();
-  Canvas.element.onmousemove = Game.updateMousePosition;
+  Canvas.element.onmousemove = Game.player.updateMousePosition;
 
   window.requestAnimationFrame(Game.loop);
 
