@@ -8,9 +8,9 @@ window.onload = function () {
     //init everything
     canvas_1.Canvas.init();
     canvas_1.Canvas.setBackground(new general_1.Color(0, 0, 0, 1));
-    game_1.Game.start();
+    game_1.Game.init();
     canvas_1.Canvas.element.onmousemove = game_1.Game.player.updateMousePosition;
-    window.requestAnimationFrame(game_1.Game.loop);
+    game_1.Game.run();
     window.addEventListener("keydown", debug_1.Debug.toggle, false);
     window.addEventListener("keydown", game_1.Game.keypress, false);
     window.addEventListener("keyup", game_1.Game.keypress, false);

@@ -7,12 +7,22 @@ import { Player } from "./character";
 import { Canvas } from "./canvas";
 import { Debug } from "./debug";
 import { Tiletip } from "./tiletip";
+import { Settings } from "./settings";
 
 export class Game {
 
   static world: World;
   static player: Player;
   static key = {};
+
+  //fps shit
+  static fpsInterval;
+  static timeInterval;
+  static curTime: number;
+  static elapsed;
+  static startTime: number;
+  static curFps: number;
+  static frameCount: number = 0;
 
   static updateResolution() {
     Canvas.updateResolution();
@@ -43,7 +53,7 @@ export class Game {
     }
   }
 
-  static start() {
+  static init() {
     Game.world = new World();
     Game.player = new Player(1, "asd");
     Game.world.genChunksOnScreen(Game.player.position.chunk.x, Game.player.position.chunk.y);
@@ -51,6 +61,7 @@ export class Game {
 
   static getDebugLines(): Array<string> {
     let debugLines:Array<string> = [
+      "FPS: " + Game.curFps + " (limit: " + Settings.fpslimit + ")",
       "Loaded chunks: " + Game.world.onscreen.join(", "),
       "Fixed position: x=" + Game.player.position.screen.x + " y=" + Game.player.position.screen.y,
       "World position: x=" + Game.player.position.world.x + " y=" + Game.player.position.world.y,
@@ -94,11 +105,28 @@ export class Game {
 
   static loop() {
     requestAnimationFrame(Game.loop);
-    let oldPosition = {x: Game.player.position.chunk.x, y: Game.player.position.chunk.y};
-    Game.player.walk(Game.key);
-    let newPosition = {x: Game.player.position.chunk.x, y: Game.player.position.chunk.y};
-    Game.comparePositions(oldPosition, newPosition);
-    Game.updateScreen();
+
+    Game.curTime = Date.now();
+    Game.elapsed = Game.curTime - Game.timeInterval;
+
+    if (Game.elapsed > Game.fpsInterval) {
+      Game.timeInterval = Game.curTime - (Game.elapsed % Game.fpsInterval);
+      let oldPosition = {x: Game.player.position.chunk.x, y: Game.player.position.chunk.y};
+      Game.player.walk(Game.key);
+      let newPosition = {x: Game.player.position.chunk.x, y: Game.player.position.chunk.y};
+      Game.comparePositions(oldPosition, newPosition);
+      Game.updateScreen();
+
+      let sinceStart: number = Game.curTime - Game.startTime;
+      Game.curFps = Math.round(1000 / (sinceStart / ++Game.frameCount));
+    }
+  }
+
+  static run() {
+    Game.fpsInterval = 1000 / Settings.fpslimit;
+    Game.timeInterval = Date.now();
+    Game.startTime = Game.timeInterval;
+    Game.loop();
   }
 
 }

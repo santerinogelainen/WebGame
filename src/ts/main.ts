@@ -11,10 +11,9 @@ window.onload = () => {
   //init everything
   Canvas.init();
   Canvas.setBackground(new Color(0, 0, 0, 1));
-  Game.start();
+  Game.init();
   Canvas.element.onmousemove = Game.player.updateMousePosition;
-
-  window.requestAnimationFrame(Game.loop);
+  Game.run();
 
   window.addEventListener("keydown", Debug.toggle, false);
   window.addEventListener("keydown", Game.keypress, false);

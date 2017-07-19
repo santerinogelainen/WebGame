@@ -9,6 +9,7 @@ var character_1 = require("./character");
 var canvas_1 = require("./canvas");
 var debug_1 = require("./debug");
 var tiletip_1 = require("./tiletip");
+var settings_1 = require("./settings");
 var Game = (function () {
     function Game() {
     }
@@ -42,13 +43,14 @@ var Game = (function () {
             tiletip_1.Tiletip.draw(Game.world.chunks[chunk_1.Chunk.hover].tiles[tile_1.Tile.hover]);
         }
     };
-    Game.start = function () {
+    Game.init = function () {
         Game.world = new world_1.World();
         Game.player = new character_1.Player(1, "asd");
         Game.world.genChunksOnScreen(Game.player.position.chunk.x, Game.player.position.chunk.y);
     };
     Game.getDebugLines = function () {
         var debugLines = [
+            "FPS: " + Game.curFps + " (limit: " + settings_1.Settings.fpslimit + ")",
             "Loaded chunks: " + Game.world.onscreen.join(", "),
             "Fixed position: x=" + Game.player.position.screen.x + " y=" + Game.player.position.screen.y,
             "World position: x=" + Game.player.position.world.x + " y=" + Game.player.position.world.y,
@@ -90,13 +92,27 @@ var Game = (function () {
     };
     Game.loop = function () {
         requestAnimationFrame(Game.loop);
-        var oldPosition = { x: Game.player.position.chunk.x, y: Game.player.position.chunk.y };
-        Game.player.walk(Game.key);
-        var newPosition = { x: Game.player.position.chunk.x, y: Game.player.position.chunk.y };
-        Game.comparePositions(oldPosition, newPosition);
-        Game.updateScreen();
+        Game.curTime = Date.now();
+        Game.elapsed = Game.curTime - Game.timeInterval;
+        if (Game.elapsed > Game.fpsInterval) {
+            Game.timeInterval = Game.curTime - (Game.elapsed % Game.fpsInterval);
+            var oldPosition = { x: Game.player.position.chunk.x, y: Game.player.position.chunk.y };
+            Game.player.walk(Game.key);
+            var newPosition = { x: Game.player.position.chunk.x, y: Game.player.position.chunk.y };
+            Game.comparePositions(oldPosition, newPosition);
+            Game.updateScreen();
+            var sinceStart = Game.curTime - Game.startTime;
+            Game.curFps = Math.round(1000 / (sinceStart / ++Game.frameCount));
+        }
+    };
+    Game.run = function () {
+        Game.fpsInterval = 1000 / settings_1.Settings.fpslimit;
+        Game.timeInterval = Date.now();
+        Game.startTime = Game.timeInterval;
+        Game.loop();
     };
     return Game;
 }());
 Game.key = {};
+Game.frameCount = 0;
 exports.Game = Game;
