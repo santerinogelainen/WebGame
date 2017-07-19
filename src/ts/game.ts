@@ -23,6 +23,7 @@ export class Game {
   static startTime: number;
   static curFps: number;
   static frameCount: number = 0;
+  static prevFrameCount: number = 0;
 
   static updateResolution() {
     Canvas.updateResolution();
@@ -118,7 +119,11 @@ export class Game {
       Game.updateScreen();
 
       let sinceStart: number = Game.curTime - Game.startTime;
-      Game.curFps = Math.round(1000 / (sinceStart / ++Game.frameCount));
+      setTimeout(function(){
+        let difference: number = Game.frameCount - Game.prevFrameCount;
+        Game.prevFrameCount = Game.frameCount;
+        Game.curFps = difference;
+      }, 1000);
     }
   }
 

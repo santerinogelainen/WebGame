@@ -102,7 +102,11 @@ var Game = (function () {
             Game.comparePositions(oldPosition, newPosition);
             Game.updateScreen();
             var sinceStart = Game.curTime - Game.startTime;
-            Game.curFps = Math.round(1000 / (sinceStart / ++Game.frameCount));
+            setTimeout(function () {
+                var difference = Game.frameCount - Game.prevFrameCount;
+                Game.prevFrameCount = Game.frameCount;
+                Game.curFps = difference;
+            }, 1000);
         }
     };
     Game.run = function () {
@@ -115,4 +119,5 @@ var Game = (function () {
 }());
 Game.key = {};
 Game.frameCount = 0;
+Game.prevFrameCount = 0;
 exports.Game = Game;
