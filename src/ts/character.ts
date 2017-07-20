@@ -44,7 +44,7 @@ export class Player extends Character {
   draw(x: number, y: number) {
     Canvas.context.beginPath();
     Canvas.context.fillStyle = "#d35400";
-    Canvas.context.arc(x - (Player.size), y - (Player.size), Player.size, 0, 2 * Math.PI);
+    Canvas.context.arc(x, y, Player.size, 0, 2 * Math.PI);
     Canvas.context.fill();
     this.position.screen.x = x;
     this.position.screen.y = y;
@@ -98,8 +98,8 @@ export class Player extends Character {
   updateMousePosition(e) {
     e = e || window.event;
     let oldPosition = {x: Player.mouse.tile.x, y: Player.mouse.tile.y};
-    Player.mouse.world.x = -(Canvas.center.x - e.pageX) + (Tile.tilesize / 2);
-    Player.mouse.world.y = (Canvas.center.y - e.pageY) - (Tile.tilesize / 2);
+    Player.mouse.world.x = -(Canvas.center.x - e.pageX);
+    Player.mouse.world.y = (Canvas.center.y - e.pageY);
     Player.mouse.chunk.x = Math.round((Player.mouse.world.x) / Chunk.chunksize);
     Player.mouse.chunk.y = Math.round((Player.mouse.world.y) / Chunk.chunksize);
     Player.mouse.tile.x = Math.floor(((Player.mouse.world.x + (Chunk.chunksize / 2) + Tile.tilesize) - (Player.mouse.chunk.x * Chunk.chunksize)) / Tile.tilesize);

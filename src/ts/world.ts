@@ -187,8 +187,8 @@ export class World {
     let chunkpositiony:number = Canvas.center.y + (Chunk.chunksize * -chunk.y) - (Chunk.chunksize / 2);
     for (let tile in chunk.tiles) {
       let t:Tile = chunk.tiles[tile];
-      let tilepositionx:number = chunkpositionx + (Tile.tilesize * (t.x - 1)) - (Tile.tilesize / 2);
-      let tilepositiony:number = chunkpositiony + (Tile.tilesize * -(t.y)) - (Tile.tilesize / 2) + Chunk.chunksize;
+      let tilepositionx:number = chunkpositionx + (Tile.tilesize * (t.x - 1));
+      let tilepositiony:number = chunkpositiony + (Tile.tilesize * -(t.y)) + Chunk.chunksize;
       if (c == Chunk.hover) {
         t.draw(tilepositionx, tilepositiony, true, tile);
       } else {

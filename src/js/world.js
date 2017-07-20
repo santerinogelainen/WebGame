@@ -175,8 +175,8 @@ var World = (function () {
         var chunkpositiony = canvas_1.Canvas.center.y + (chunk_1.Chunk.chunksize * -chunk.y) - (chunk_1.Chunk.chunksize / 2);
         for (var tile in chunk.tiles) {
             var t = chunk.tiles[tile];
-            var tilepositionx = chunkpositionx + (tile_1.Tile.tilesize * (t.x - 1)) - (tile_1.Tile.tilesize / 2);
-            var tilepositiony = chunkpositiony + (tile_1.Tile.tilesize * -(t.y)) - (tile_1.Tile.tilesize / 2) + chunk_1.Chunk.chunksize;
+            var tilepositionx = chunkpositionx + (tile_1.Tile.tilesize * (t.x - 1));
+            var tilepositiony = chunkpositiony + (tile_1.Tile.tilesize * -(t.y)) + chunk_1.Chunk.chunksize;
             if (c == chunk_1.Chunk.hover) {
                 t.draw(tilepositionx, tilepositiony, true, tile);
             }

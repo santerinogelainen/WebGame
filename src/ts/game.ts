@@ -109,6 +109,7 @@ export class Game {
 
     Game.curTime = Date.now();
     Game.elapsed = Game.curTime - Game.timeInterval;
+    let sinceStart: number = Game.curTime - Game.startTime;
 
     if (Game.elapsed > Game.fpsInterval) {
       Game.timeInterval = Game.curTime - (Game.elapsed % Game.fpsInterval);
@@ -118,12 +119,8 @@ export class Game {
       Game.comparePositions(oldPosition, newPosition);
       Game.updateScreen();
 
-      let sinceStart: number = Game.curTime - Game.startTime;
-      setTimeout(function(){
-        let difference: number = Game.frameCount - Game.prevFrameCount;
-        Game.prevFrameCount = Game.frameCount;
-        Game.curFps = difference;
-      }, 1000);
+      Game.frameCount++;
+      Game.curFps = Math.round((Game.frameCount / sinceStart) * 1000);
     }
   }
 

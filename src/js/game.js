@@ -94,6 +94,7 @@ var Game = (function () {
         requestAnimationFrame(Game.loop);
         Game.curTime = Date.now();
         Game.elapsed = Game.curTime - Game.timeInterval;
+        var sinceStart = Game.curTime - Game.startTime;
         if (Game.elapsed > Game.fpsInterval) {
             Game.timeInterval = Game.curTime - (Game.elapsed % Game.fpsInterval);
             var oldPosition = { x: Game.player.position.chunk.x, y: Game.player.position.chunk.y };
@@ -101,12 +102,8 @@ var Game = (function () {
             var newPosition = { x: Game.player.position.chunk.x, y: Game.player.position.chunk.y };
             Game.comparePositions(oldPosition, newPosition);
             Game.updateScreen();
-            var sinceStart = Game.curTime - Game.startTime;
-            setTimeout(function () {
-                var difference = Game.frameCount - Game.prevFrameCount;
-                Game.prevFrameCount = Game.frameCount;
-                Game.curFps = difference;
-            }, 1000);
+            Game.frameCount++;
+            Game.curFps = Math.round((Game.frameCount / sinceStart) * 1000);
         }
     };
     Game.run = function () {
