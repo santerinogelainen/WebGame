@@ -14,12 +14,16 @@ export enum VerticalAlign {
   TOP, MIDDLE, BOTTOM
 }
 
+export enum Shape {
+  RECTANGLE, CIRCLE, TRIANGLE
+}
+
 export function rng(min: number, max:number) {
   return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
 export class Texture {
-  element: HTMLImageElement;
+  element: HTMLImageElement = new Image();
 
   constructor(possibilities: Array<string>) {
     this.setTexture(possibilities);

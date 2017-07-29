@@ -1,5 +1,7 @@
 
 import * as tiles from "./tile";
+import { Environment } from "./environment";
+import { rng } from "./general";
 
 interface Noise {
   min: number,
@@ -85,6 +87,13 @@ class Forest extends Plains {
   humidity = {
     min: -25,
     max: 50
+  };
+  getTile(x: number, y: number) {
+    let n: number = rng(1, 10);
+    if (n > Environment.treernglimit) {
+      return new tiles.Grass(x, y, true);
+    }
+    return new tiles.Grass(x, y);
   };
 }
 

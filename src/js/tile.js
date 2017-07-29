@@ -16,9 +16,10 @@ var canvas_1 = require("./canvas");
 var debug_1 = require("./debug");
 var general_2 = require("./general");
 var mouse_1 = require("./mouse");
+var general_3 = require("./general");
+var environment_1 = require("./environment");
 var Tile = (function () {
     function Tile(x, y) {
-        this.texture = new Image();
         this.x = x;
         this.y = y;
     }
@@ -34,11 +35,6 @@ var Tile = (function () {
         var tile = Tile.getMouseCoordinates(chunksize, chunk);
         var tilestring = general_2.coordinatesToString(tile.x, tile.y);
         Tile.hover = tilestring;
-    };
-    //randomly pick a texture for the tile (or if only 1 then that one)
-    Tile.prototype.setTexture = function (src) {
-        var rng = Math.floor(Math.random() * src.length);
-        this.texture.src = src[rng];
     };
     Tile.generateNoise = function (x, y, seed, abs) {
         if (abs === void 0) { abs = false; }
@@ -65,7 +61,7 @@ var Tile = (function () {
                 canvas_1.Canvas.context.fillRect(x, y, Tile.size, Tile.size);
             }
             else {
-                canvas_1.Canvas.context.drawImage(this.texture, x, y, Tile.size, Tile.size);
+                canvas_1.Canvas.context.drawImage(this.texture.element, x, y, Tile.size, Tile.size);
             }
         }
         if (debug_1.Debug.worldtext) {
@@ -75,6 +71,9 @@ var Tile = (function () {
         }
         if (chunk && Tile.hover == tile) {
             this.drawStroke(x, y);
+        }
+        if (this.environment != null) {
+            this.environment.draw(x, y);
         }
     };
     Tile.prototype.drawStroke = function (x, y) {
@@ -90,102 +89,94 @@ Tile.hover = "";
 exports.Tile = Tile;
 var Grass = (function (_super) {
     __extends(Grass, _super);
-    function Grass(x, y) {
+    function Grass(x, y, tree) {
+        if (tree === void 0) { tree = false; }
         var _this = _super.call(this, x, y) || this;
         _this.color = new general_1.Color(77, 189, 51, 1);
         _this.name = "Grass";
-        _this.textures = [
+        _this.texture = new general_3.Texture([
             "src/img/grass_3.png",
             "src/img/grass_4.png"
-        ];
-        _this.setTexture(_this.textures);
+        ]);
+        if (tree) {
+            _this.environment = new environment_1.Tree();
+        }
         return _this;
     }
     return Grass;
 }(Tile));
-Grass.id = 1;
 exports.Grass = Grass;
 var DeepWater = (function (_super) {
     __extends(DeepWater, _super);
-    function DeepWater(x, y) {
-        var _this = _super.call(this, x, y) || this;
+    function DeepWater() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
         _this.color = new general_1.Color(38, 98, 133, 1);
         _this.name = "Deep Water";
-        _this.textures = [
+        _this.texture = new general_3.Texture([
             "src/img/water.png",
             "src/img/water_1.png"
-        ];
-        _this.setTexture(_this.textures);
+        ]);
         return _this;
     }
     return DeepWater;
 }(Tile));
-DeepWater.id = 2;
 exports.DeepWater = DeepWater;
 var Water = (function (_super) {
     __extends(Water, _super);
-    function Water(x, y) {
-        var _this = _super.call(this, x, y) || this;
+    function Water() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
         _this.color = new general_1.Color(64, 164, 223, 1);
         _this.name = "Water";
-        _this.textures = [
+        _this.texture = new general_3.Texture([
             "src/img/water.png",
             "src/img/water_1.png"
-        ];
-        _this.setTexture(_this.textures);
+        ]);
         return _this;
     }
     return Water;
 }(Tile));
-Water.id = 2;
 exports.Water = Water;
 var Sand = (function (_super) {
     __extends(Sand, _super);
-    function Sand(x, y) {
-        var _this = _super.call(this, x, y) || this;
+    function Sand() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
         _this.color = new general_1.Color(237, 201, 175, 1);
         _this.name = "Sand";
-        _this.textures = [
+        _this.texture = new general_3.Texture([
             "src/img/sand.png",
             "src/img/sand_1.png",
             "src/img/sand_2.png"
-        ];
-        _this.setTexture(_this.textures);
+        ]);
         return _this;
     }
     return Sand;
 }(Tile));
-Sand.id = 3;
 exports.Sand = Sand;
 var Ice = (function (_super) {
     __extends(Ice, _super);
-    function Ice(x, y) {
-        var _this = _super.call(this, x, y) || this;
+    function Ice() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
         _this.color = new general_1.Color(212, 240, 255, 1);
         _this.name = "Ice";
-        _this.textures = [
+        _this.texture = new general_3.Texture([
             "src/img/ice.png"
-        ];
-        _this.setTexture(_this.textures);
+        ]);
         return _this;
     }
     return Ice;
 }(Tile));
-Ice.id = 4;
 exports.Ice = Ice;
 var Snow = (function (_super) {
     __extends(Snow, _super);
-    function Snow(x, y) {
-        var _this = _super.call(this, x, y) || this;
+    function Snow() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
         _this.color = new general_1.Color(248, 248, 255, 1);
         _this.name = "Snow";
-        _this.textures = [
+        _this.texture = new general_3.Texture([
             "src/img/snow.png"
-        ];
-        _this.setTexture(_this.textures);
+        ]);
         return _this;
     }
     return Snow;
 }(Tile));
-Snow.id = 5;
 exports.Snow = Snow;

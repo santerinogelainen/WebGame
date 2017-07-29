@@ -7,6 +7,7 @@ var Settings = (function () {
     return Settings;
 }());
 Settings.usetilecolor = true;
+Settings.useenvironmentcolor = false;
 Settings.tilehovercolor = new general_1.Color(255, 215, 0, 1);
 Settings.tilehoverlinewidth = 2;
 Settings.fpslimit = 60;

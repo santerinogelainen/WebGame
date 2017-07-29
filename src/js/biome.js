@@ -11,6 +11,8 @@ var __extends = (this && this.__extends) || (function () {
 })();
 exports.__esModule = true;
 var tiles = require("./tile");
+var environment_1 = require("./environment");
+var general_1 = require("./general");
 var BiomeTemplate = (function () {
     function BiomeTemplate() {
     }
@@ -98,6 +100,14 @@ var Forest = (function (_super) {
         };
         return _this;
     }
+    Forest.prototype.getTile = function (x, y) {
+        var n = general_1.rng(1, 10);
+        if (n > environment_1.Environment.treernglimit) {
+            return new tiles.Grass(x, y, true);
+        }
+        return new tiles.Grass(x, y);
+    };
+    ;
     return Forest;
 }(Plains));
 Forest.biomename = "Forest";

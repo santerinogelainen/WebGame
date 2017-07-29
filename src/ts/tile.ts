@@ -7,6 +7,8 @@ import { coordinatesToString } from "./general";
 import { Mouse } from "./mouse";
 import { Environment } from "./environment";
 import { Texture } from "./general";
+import { Tree } from "./environment";
+import { rng } from "./general";
 
 declare var noise;
 
@@ -16,7 +18,7 @@ export class Tile {
   static hover = "";
   name: string;
   texture: Texture;
-  environment: Environment;
+  environment;
   color: Color;
   x: number;
   y: number;
@@ -74,6 +76,9 @@ export class Tile {
     if (chunk && Tile.hover == tile) {
       this.drawStroke(x, y);
     }
+    if (this.environment != null) {
+      this.environment.draw(x, y);
+    }
   }
 
   drawStroke(x: number, y: number) {
@@ -92,6 +97,12 @@ export class Grass extends Tile {
     "src/img/grass_3.png",
     "src/img/grass_4.png"
   ]);
+  constructor(x, y, tree: Boolean = false) {
+    super(x, y);
+    if (tree) {
+      this.environment = new Tree();
+    }
+  }
 }
 
 export class DeepWater extends Tile {

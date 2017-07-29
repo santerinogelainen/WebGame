@@ -25,10 +25,29 @@ var VerticalAlign;
     VerticalAlign[VerticalAlign["MIDDLE"] = 1] = "MIDDLE";
     VerticalAlign[VerticalAlign["BOTTOM"] = 2] = "BOTTOM";
 })(VerticalAlign = exports.VerticalAlign || (exports.VerticalAlign = {}));
+var Shape;
+(function (Shape) {
+    Shape[Shape["RECTANGLE"] = 0] = "RECTANGLE";
+    Shape[Shape["CIRCLE"] = 1] = "CIRCLE";
+    Shape[Shape["TRIANGLE"] = 2] = "TRIANGLE";
+})(Shape = exports.Shape || (exports.Shape = {}));
 function rng(min, max) {
     return Math.floor(Math.random() * (max - min + 1) + min);
 }
 exports.rng = rng;
+var Texture = (function () {
+    function Texture(possibilities) {
+        this.element = new Image();
+        this.setTexture(possibilities);
+    }
+    //randomly pick a texture (or if only 1 then that one)
+    Texture.prototype.setTexture = function (srcs) {
+        var rng = Math.floor(Math.random() * srcs.length);
+        this.element.src = srcs[rng];
+    };
+    return Texture;
+}());
+exports.Texture = Texture;
 var Color = (function () {
     function Color(r, g, b, a) {
         this.r = r;
