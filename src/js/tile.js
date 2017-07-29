@@ -15,18 +15,25 @@ var settings_1 = require("./settings");
 var canvas_1 = require("./canvas");
 var debug_1 = require("./debug");
 var general_2 = require("./general");
+var mouse_1 = require("./mouse");
 var Tile = (function () {
     function Tile(x, y) {
         this.texture = new Image();
         this.x = x;
         this.y = y;
     }
+    Tile.getMouseCoordinates = function (chunksize, chunk) {
+        var x = Math.floor(((mouse_1.Mouse.position.world.x + (chunksize / 2) + Tile.size) - (chunk.x * chunksize)) / Tile.size);
+        var y = Math.floor(((mouse_1.Mouse.position.world.y + (chunksize / 2) + Tile.size) - (chunk.y * chunksize)) / Tile.size);
+        return { "x": x, "y": y };
+    };
     /*
     * Updates the current hovered tile
     */
-    Tile.updateHover = function (x, y) {
-        var tile = general_2.coordinatesToString(x, y);
-        Tile.hover = tile;
+    Tile.updateHover = function (chunksize, chunk) {
+        var tile = Tile.getMouseCoordinates(chunksize, chunk);
+        var tilestring = general_2.coordinatesToString(tile.x, tile.y);
+        Tile.hover = tilestring;
     };
     //randomly pick a texture for the tile (or if only 1 then that one)
     Tile.prototype.setTexture = function (src) {
@@ -48,17 +55,17 @@ var Tile = (function () {
     Tile.prototype.draw = function (x, y, chunk, tile) {
         canvas_1.Canvas.context.beginPath();
         if (debug_1.Debug.lines) {
-            canvas_1.Canvas.context.rect(x, y, Tile.tilesize, Tile.tilesize);
+            canvas_1.Canvas.context.rect(x, y, Tile.size, Tile.size);
             canvas_1.Canvas.context.strokeStyle = this.color.toRGBA();
             canvas_1.Canvas.context.stroke();
         }
         else {
             if (settings_1.Settings.usetilecolor) {
                 canvas_1.Canvas.context.fillStyle = this.color.toRGBA();
-                canvas_1.Canvas.context.fillRect(x, y, Tile.tilesize, Tile.tilesize);
+                canvas_1.Canvas.context.fillRect(x, y, Tile.size, Tile.size);
             }
             else {
-                canvas_1.Canvas.context.drawImage(this.texture, x, y, Tile.tilesize, Tile.tilesize);
+                canvas_1.Canvas.context.drawImage(this.texture, x, y, Tile.size, Tile.size);
             }
         }
         if (debug_1.Debug.worldtext) {
@@ -74,11 +81,11 @@ var Tile = (function () {
         canvas_1.Canvas.context.beginPath();
         canvas_1.Canvas.context.lineWidth = settings_1.Settings.tilehoverlinewidth;
         canvas_1.Canvas.context.strokeStyle = settings_1.Settings.tilehovercolor.toRGBA();
-        canvas_1.Canvas.context.strokeRect(x, y, Tile.tilesize, Tile.tilesize);
+        canvas_1.Canvas.context.strokeRect(x, y, Tile.size, Tile.size);
     };
     return Tile;
 }());
-Tile.tilesize = 40;
+Tile.size = 40;
 Tile.hover = "";
 exports.Tile = Tile;
 var Grass = (function (_super) {

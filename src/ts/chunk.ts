@@ -1,15 +1,16 @@
 import { Tile } from "./tile";
 import { coordinatesToString } from "./general";
-import { Canvas } from "./Canvas";
+import { Canvas } from "./canvas";
 import { Biome } from "./biome";
 import { Sea } from "./biome";
+import { Debug } from "./debug";
+import { Mouse } from "./mouse";
 
 export class Chunk {
 
   tiles = {};
   static tilesperside:number = 7; //USE ONLY NUMBERS WHERE % 2 = 1;
-  static chunksize:number = Chunk.tilesperside * Tile.tilesize;
-  static loadsensitivity:number = 2;
+  static size:number = Chunk.tilesperside * Tile.size;
   static perscreen:any = {x: 0, y: 0};
   static hover = "";
   x: number;
@@ -21,20 +22,28 @@ export class Chunk {
     this.generate(seed);
   }
 
+  static getMouseCoordinates() {
+    let x: number = Math.round((Mouse.position.world.x) / Chunk.size);
+    let y: number = Math.round((Mouse.position.world.y) / Chunk.size);
+    return {"x": x, "y": y};
+  }
+
   /*
-  * Updates the current hovered chunk
+  * Updates the current hovered chunk and tile
   */
-  static updateHover(x: number, y: number) {
-    let chunk: string = coordinatesToString(x, y);
+  static updateHover() {
+    let coords = Chunk.getMouseCoordinates();
+    let chunk: string = coordinatesToString(coords.x, coords.y);
     Chunk.hover = chunk;
+    Tile.updateHover(Chunk.size, coords);
   }
 
   /*
   * Calculate how many chunks can fit the screen
   */
   static calculatePerScreenRatio(): void {
-    Chunk.perscreen.x = Math.ceil(Canvas.width / Chunk.chunksize);
-    Chunk.perscreen.y = Math.ceil(Canvas.height / Chunk.chunksize);
+    Chunk.perscreen.x = Math.ceil(Canvas.width / Chunk.size);
+    Chunk.perscreen.y = Math.ceil(Canvas.height / Chunk.size);
   }
 
   /*
@@ -76,4 +85,33 @@ export class Chunk {
       }
     }
   }
+
+  draw() {
+    let chunk: string = coordinatesToString(this.x, this.y);
+    let chunkpositionx:number = Canvas.center.x + (Chunk.size * this.x) - (Chunk.size / 2);
+    let chunkpositiony:number = Canvas.center.y + (Chunk.size * -this.y) - (Chunk.size / 2);
+    for (let t in this.tiles) {
+      let tile:Tile = this.tiles[t];
+      let tilepositionx:number = chunkpositionx + (Tile.size * (tile.x - 1));
+      let tilepositiony:number = chunkpositiony + (Tile.size * -(tile.y)) + Chunk.size;
+      if (chunk == Chunk.hover) {
+        tile.draw(tilepositionx, tilepositiony, true, t);
+      } else {
+        tile.draw(tilepositionx, tilepositiony, false, t);
+      }
+    }
+    if (Debug.worldtext) {
+      Canvas.context.beginPath();
+      Canvas.context.font = "15px sans-serif";
+      Canvas.context.fillStyle = "red";
+      Canvas.context.fillText("" + this.x + ", " + this.y, chunkpositionx - (Tile.size / 2) + 5, chunkpositiony - (Tile.size / 2) + 20);
+    }
+    if (Debug.lines) {
+      Canvas.context.beginPath();
+      Canvas.context.rect(chunkpositionx - (Tile.size / 2), chunkpositiony - (Tile.size / 2), Chunk.size, Chunk.size);
+      Canvas.context.strokeStyle = "red";
+      Canvas.context.stroke();
+    }
+  }
+
 }

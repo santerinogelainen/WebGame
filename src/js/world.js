@@ -1,10 +1,7 @@
 "use strict";
 exports.__esModule = true;
-var canvas_1 = require("./canvas");
 var general_1 = require("./general");
 var general_2 = require("./general");
-var tile_1 = require("./tile");
-var debug_1 = require("./debug");
 var chunk_1 = require("./chunk");
 var general_3 = require("./general");
 var general_4 = require("./general");
@@ -169,32 +166,10 @@ var World = (function () {
     /*
     * Draws a single chunk
     */
-    World.prototype.drawChunk = function (chunk) {
-        var c = general_4.coordinatesToString(chunk.x, chunk.y);
-        var chunkpositionx = canvas_1.Canvas.center.x + (chunk_1.Chunk.chunksize * chunk.x) - (chunk_1.Chunk.chunksize / 2);
-        var chunkpositiony = canvas_1.Canvas.center.y + (chunk_1.Chunk.chunksize * -chunk.y) - (chunk_1.Chunk.chunksize / 2);
-        for (var tile in chunk.tiles) {
-            var t = chunk.tiles[tile];
-            var tilepositionx = chunkpositionx + (tile_1.Tile.tilesize * (t.x - 1));
-            var tilepositiony = chunkpositiony + (tile_1.Tile.tilesize * -(t.y)) + chunk_1.Chunk.chunksize;
-            if (c == chunk_1.Chunk.hover) {
-                t.draw(tilepositionx, tilepositiony, true, tile);
-            }
-            else {
-                t.draw(tilepositionx, tilepositiony, false, tile);
-            }
-        }
-        if (debug_1.Debug.worldtext) {
-            canvas_1.Canvas.context.beginPath();
-            canvas_1.Canvas.context.font = "15px sans-serif";
-            canvas_1.Canvas.context.fillStyle = "red";
-            canvas_1.Canvas.context.fillText("" + chunk.x + ", " + chunk.y, chunkpositionx - (tile_1.Tile.tilesize / 2) + 5, chunkpositiony - (tile_1.Tile.tilesize / 2) + 20);
-        }
-        if (debug_1.Debug.lines) {
-            canvas_1.Canvas.context.beginPath();
-            canvas_1.Canvas.context.rect(chunkpositionx - (tile_1.Tile.tilesize / 2), chunkpositiony - (tile_1.Tile.tilesize / 2), chunk_1.Chunk.chunksize, chunk_1.Chunk.chunksize);
-            canvas_1.Canvas.context.strokeStyle = "red";
-            canvas_1.Canvas.context.stroke();
+    World.prototype.draw = function () {
+        for (var _i = 0, _a = this.onscreen; _i < _a.length; _i++) {
+            var chunk = _a[_i];
+            this.chunks[chunk].draw();
         }
     };
     /*

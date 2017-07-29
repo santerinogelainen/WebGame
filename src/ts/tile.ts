@@ -4,12 +4,13 @@ import { Settings } from "./settings";
 import { Canvas } from "./canvas";
 import { Debug } from "./debug";
 import { coordinatesToString } from "./general";
+import { Mouse } from "./mouse";
 
 declare var noise;
 
 export class Tile {
 
-  static tilesize: number = 40;
+  static size: number = 40;
   static hover = "";
   texture:HTMLImageElement = new Image();
   name: string;
@@ -22,12 +23,19 @@ export class Tile {
     this.y = y;
   }
 
+  static getMouseCoordinates(chunksize, chunk) {
+    let x: number = Math.floor(((Mouse.position.world.x + (chunksize / 2) + Tile.size) - (chunk.x * chunksize)) / Tile.size);
+    let y: number = Math.floor(((Mouse.position.world.y + (chunksize / 2) + Tile.size) - (chunk.y * chunksize)) / Tile.size);
+    return {"x": x, "y": y};
+  }
+
   /*
   * Updates the current hovered tile
   */
-  static updateHover(x: number, y: number) {
-    let tile: string = coordinatesToString(x, y);
-    Tile.hover = tile;
+  static updateHover(chunksize, chunk) {
+    let tile = Tile.getMouseCoordinates(chunksize, chunk);
+    let tilestring = coordinatesToString(tile.x, tile.y);
+    Tile.hover = tilestring;
   }
 
   //randomly pick a texture for the tile (or if only 1 then that one)
@@ -50,15 +58,15 @@ export class Tile {
   draw(x: number, y: number, chunk: boolean, tile: string) {
     Canvas.context.beginPath();
     if (Debug.lines) {
-      Canvas.context.rect(x, y, Tile.tilesize, Tile.tilesize);
+      Canvas.context.rect(x, y, Tile.size, Tile.size);
       Canvas.context.strokeStyle = this.color.toRGBA();
       Canvas.context.stroke();
     } else {
       if (Settings.usetilecolor) {
         Canvas.context.fillStyle = this.color.toRGBA();
-        Canvas.context.fillRect(x, y, Tile.tilesize, Tile.tilesize);
+        Canvas.context.fillRect(x, y, Tile.size, Tile.size);
       } else {
-        Canvas.context.drawImage(this.texture, x, y, Tile.tilesize, Tile.tilesize);
+        Canvas.context.drawImage(this.texture, x, y, Tile.size, Tile.size);
       }
     }
     if (Debug.worldtext) {
@@ -75,7 +83,7 @@ export class Tile {
     Canvas.context.beginPath();
     Canvas.context.lineWidth = Settings.tilehoverlinewidth;
     Canvas.context.strokeStyle = Settings.tilehovercolor.toRGBA();
-    Canvas.context.strokeRect(x, y, Tile.tilesize, Tile.tilesize);
+    Canvas.context.strokeRect(x, y, Tile.size, Tile.size);
   }
 
 }

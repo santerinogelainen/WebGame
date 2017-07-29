@@ -10,6 +10,7 @@ var canvas_1 = require("./canvas");
 var debug_1 = require("./debug");
 var tiletip_1 = require("./tiletip");
 var settings_1 = require("./settings");
+var mouse_1 = require("./mouse");
 var Game = (function () {
     function Game() {
     }
@@ -23,10 +24,7 @@ var Game = (function () {
         //update background
         canvas_1.Canvas.updateBackground();
         //update each chunk
-        for (var _i = 0, _a = Game.world.onscreen; _i < _a.length; _i++) {
-            var chunk = _a[_i];
-            Game.world.drawChunk(Game.world.chunks[chunk]);
-        }
+        Game.world.draw();
         //update character
         if (updateResolution) {
             Game.player.draw(canvas_1.Canvas.center.x, canvas_1.Canvas.center.y);
@@ -57,8 +55,8 @@ var Game = (function () {
             "Chunk position: x=" + Game.player.position.chunk.x + " y=" + Game.player.position.chunk.y,
             "Tile position: x=" + Game.player.position.tile.x + " y=" + Game.player.position.tile.y,
             "Tiles per chunk (side): " + chunk_1.Chunk.tilesperside,
-            "Chunk size: " + chunk_1.Chunk.chunksize,
-            "Tile size: " + tile_1.Tile.tilesize
+            "Chunk size: " + chunk_1.Chunk.size,
+            "Tile size: " + tile_1.Tile.size
         ];
         return debugLines;
     };
@@ -71,6 +69,10 @@ var Game = (function () {
         else {
             Game.player.moving = false;
         }
+    };
+    Game.updateHover = function () {
+        mouse_1.Mouse.updateWorldPosition();
+        chunk_1.Chunk.updateHover();
     };
     Game.comparePositions = function (oldPosition, newPosition) {
         if (oldPosition.x != newPosition.x) {
@@ -96,6 +98,7 @@ var Game = (function () {
         Game.elapsed = Game.curTime - Game.timeInterval;
         var sinceStart = Game.curTime - Game.startTime;
         if (Game.elapsed > Game.fpsInterval) {
+            Game.updateHover();
             Game.timeInterval = Game.curTime - (Game.elapsed % Game.fpsInterval);
             var oldPosition = { x: Game.player.position.chunk.x, y: Game.player.position.chunk.y };
             Game.player.walk(Game.key);

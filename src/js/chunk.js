@@ -2,9 +2,11 @@
 exports.__esModule = true;
 var tile_1 = require("./tile");
 var general_1 = require("./general");
-var Canvas_1 = require("./Canvas");
+var canvas_1 = require("./canvas");
 var biome_1 = require("./biome");
 var biome_2 = require("./biome");
+var debug_1 = require("./debug");
+var mouse_1 = require("./mouse");
 var Chunk = (function () {
     function Chunk(x, y, seed) {
         this.tiles = {};
@@ -12,19 +14,26 @@ var Chunk = (function () {
         this.y = y;
         this.generate(seed);
     }
+    Chunk.getMouseCoordinates = function () {
+        var x = Math.round((mouse_1.Mouse.position.world.x) / Chunk.size);
+        var y = Math.round((mouse_1.Mouse.position.world.y) / Chunk.size);
+        return { "x": x, "y": y };
+    };
     /*
-    * Updates the current hovered chunk
+    * Updates the current hovered chunk and tile
     */
-    Chunk.updateHover = function (x, y) {
-        var chunk = general_1.coordinatesToString(x, y);
+    Chunk.updateHover = function () {
+        var coords = Chunk.getMouseCoordinates();
+        var chunk = general_1.coordinatesToString(coords.x, coords.y);
         Chunk.hover = chunk;
+        tile_1.Tile.updateHover(Chunk.size, coords);
     };
     /*
     * Calculate how many chunks can fit the screen
     */
     Chunk.calculatePerScreenRatio = function () {
-        Chunk.perscreen.x = Math.ceil(Canvas_1.Canvas.width / Chunk.chunksize);
-        Chunk.perscreen.y = Math.ceil(Canvas_1.Canvas.height / Chunk.chunksize);
+        Chunk.perscreen.x = Math.ceil(canvas_1.Canvas.width / Chunk.size);
+        Chunk.perscreen.y = Math.ceil(canvas_1.Canvas.height / Chunk.size);
     };
     /*
     * Generates the necessary tiles for the chunk
@@ -65,11 +74,38 @@ var Chunk = (function () {
             }
         }
     };
+    Chunk.prototype.draw = function () {
+        var chunk = general_1.coordinatesToString(this.x, this.y);
+        var chunkpositionx = canvas_1.Canvas.center.x + (Chunk.size * this.x) - (Chunk.size / 2);
+        var chunkpositiony = canvas_1.Canvas.center.y + (Chunk.size * -this.y) - (Chunk.size / 2);
+        for (var t in this.tiles) {
+            var tile = this.tiles[t];
+            var tilepositionx = chunkpositionx + (tile_1.Tile.size * (tile.x - 1));
+            var tilepositiony = chunkpositiony + (tile_1.Tile.size * -(tile.y)) + Chunk.size;
+            if (chunk == Chunk.hover) {
+                tile.draw(tilepositionx, tilepositiony, true, t);
+            }
+            else {
+                tile.draw(tilepositionx, tilepositiony, false, t);
+            }
+        }
+        if (debug_1.Debug.worldtext) {
+            canvas_1.Canvas.context.beginPath();
+            canvas_1.Canvas.context.font = "15px sans-serif";
+            canvas_1.Canvas.context.fillStyle = "red";
+            canvas_1.Canvas.context.fillText("" + this.x + ", " + this.y, chunkpositionx - (tile_1.Tile.size / 2) + 5, chunkpositiony - (tile_1.Tile.size / 2) + 20);
+        }
+        if (debug_1.Debug.lines) {
+            canvas_1.Canvas.context.beginPath();
+            canvas_1.Canvas.context.rect(chunkpositionx - (tile_1.Tile.size / 2), chunkpositiony - (tile_1.Tile.size / 2), Chunk.size, Chunk.size);
+            canvas_1.Canvas.context.strokeStyle = "red";
+            canvas_1.Canvas.context.stroke();
+        }
+    };
     return Chunk;
 }());
 Chunk.tilesperside = 7; //USE ONLY NUMBERS WHERE % 2 = 1;
-Chunk.chunksize = Chunk.tilesperside * tile_1.Tile.tilesize;
-Chunk.loadsensitivity = 2;
+Chunk.size = Chunk.tilesperside * tile_1.Tile.size;
 Chunk.perscreen = { x: 0, y: 0 };
 Chunk.hover = "";
 exports.Chunk = Chunk;

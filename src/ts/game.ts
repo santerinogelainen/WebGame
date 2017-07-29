@@ -8,6 +8,7 @@ import { Canvas } from "./canvas";
 import { Debug } from "./debug";
 import { Tiletip } from "./tiletip";
 import { Settings } from "./settings";
+import { Mouse } from "./mouse";
 
 export class Game {
 
@@ -35,9 +36,7 @@ export class Game {
     //update background
     Canvas.updateBackground();
     //update each chunk
-    for (let chunk of Game.world.onscreen) {
-      Game.world.drawChunk(Game.world.chunks[chunk]);
-    }
+    Game.world.draw();
     //update character
     if (updateResolution) {
       Game.player.draw(Canvas.center.x, Canvas.center.y);
@@ -69,8 +68,8 @@ export class Game {
       "Chunk position: x=" + Game.player.position.chunk.x + " y=" + Game.player.position.chunk.y,
       "Tile position: x=" + Game.player.position.tile.x + " y=" + Game.player.position.tile.y,
       "Tiles per chunk (side): " + Chunk.tilesperside,
-      "Chunk size: " + Chunk.chunksize,
-      "Tile size: " + Tile.tilesize
+      "Chunk size: " + Chunk.size,
+      "Tile size: " + Tile.size
     ];
     return debugLines;
   }
@@ -83,6 +82,11 @@ export class Game {
     } else {
       Game.player.moving = false;
     }
+  }
+
+  static updateHover() {
+    Mouse.updateWorldPosition();
+    Chunk.updateHover();
   }
 
   static comparePositions(oldPosition, newPosition): void {
@@ -112,6 +116,7 @@ export class Game {
     let sinceStart: number = Game.curTime - Game.startTime;
 
     if (Game.elapsed > Game.fpsInterval) {
+      Game.updateHover();
       Game.timeInterval = Game.curTime - (Game.elapsed % Game.fpsInterval);
       let oldPosition = {x: Game.player.position.chunk.x, y: Game.player.position.chunk.y};
       Game.player.walk(Game.key);

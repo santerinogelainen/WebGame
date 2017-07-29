@@ -1,13 +1,8 @@
-import { Canvas } from "./canvas";
 import { Direction } from "./general";
 import { Position } from "./general";
-import { Tile } from "./tile";
-import { Debug } from "./debug";
-import { Settings } from "./settings";
 import { Chunk } from "./chunk";
 import { rng } from "./general";
 import { coordinatesToString } from "./general";
-declare var noise;
 
 export class World {
 
@@ -181,31 +176,9 @@ export class World {
   /*
   * Draws a single chunk
   */
-  drawChunk(chunk: Chunk) {
-    let c: string = coordinatesToString(chunk.x, chunk.y);
-    let chunkpositionx:number = Canvas.center.x + (Chunk.chunksize * chunk.x) - (Chunk.chunksize / 2);
-    let chunkpositiony:number = Canvas.center.y + (Chunk.chunksize * -chunk.y) - (Chunk.chunksize / 2);
-    for (let tile in chunk.tiles) {
-      let t:Tile = chunk.tiles[tile];
-      let tilepositionx:number = chunkpositionx + (Tile.tilesize * (t.x - 1));
-      let tilepositiony:number = chunkpositiony + (Tile.tilesize * -(t.y)) + Chunk.chunksize;
-      if (c == Chunk.hover) {
-        t.draw(tilepositionx, tilepositiony, true, tile);
-      } else {
-        t.draw(tilepositionx, tilepositiony, false, tile);
-      }
-    }
-    if (Debug.worldtext) {
-      Canvas.context.beginPath();
-      Canvas.context.font = "15px sans-serif";
-      Canvas.context.fillStyle = "red";
-      Canvas.context.fillText("" + chunk.x + ", " + chunk.y, chunkpositionx - (Tile.tilesize / 2) + 5, chunkpositiony - (Tile.tilesize / 2) + 20);
-    }
-    if (Debug.lines) {
-      Canvas.context.beginPath();
-      Canvas.context.rect(chunkpositionx - (Tile.tilesize / 2), chunkpositiony - (Tile.tilesize / 2), Chunk.chunksize, Chunk.chunksize);
-      Canvas.context.strokeStyle = "red";
-      Canvas.context.stroke();
+  draw() {
+    for (let chunk of this.onscreen) {
+      this.chunks[chunk].draw();
     }
   }
 

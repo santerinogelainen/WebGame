@@ -1,24 +1,31 @@
 "use strict";
 exports.__esModule = true;
-/*
-* Abstract class
-*/
+var canvas_1 = require("./canvas");
 var Mouse = (function () {
     function Mouse() {
     }
     /*
-    * Updates the mouse position in relation to the canvas.
+    * onmousemove event that changes the classes page position to corresponding
+    * e.pageX and e.pageY
     */
-    Mouse.updateMousePosition = function (e) {
+    Mouse.updatePagePosition = function (e) {
         e = e || window.event;
-        Mouse.position.world.x = e.pageX;
-        Mouse.position.world.y = e.pageY;
+        Mouse.position.page.x = e.pageX;
+        Mouse.position.page.y = e.pageY;
+        Mouse.updateWorldPosition();
+    };
+    /*
+    * Updates the mouse's position in relation to the center of the world.
+    * Uses the page position to calculate the position
+    */
+    Mouse.updateWorldPosition = function () {
+        Mouse.position.world.x = -(canvas_1.Canvas.center.x - Mouse.position.page.x);
+        Mouse.position.world.y = (canvas_1.Canvas.center.y - Mouse.position.page.y);
     };
     return Mouse;
 }());
 Mouse.position = {
-    world: { x: 0, y: 0 },
-    chunk: { x: 0, y: 0 },
-    tile: { x: 0, y: 0 }
+    page: { x: 0, y: 0 },
+    world: { x: 0, y: 0 }
 };
 exports.Mouse = Mouse;
