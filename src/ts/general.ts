@@ -18,6 +18,20 @@ export function rng(min: number, max:number) {
   return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
+export class Texture {
+  element: HTMLImageElement;
+
+  constructor(possibilities: Array<string>) {
+    this.setTexture(possibilities);
+  }
+
+  //randomly pick a texture (or if only 1 then that one)
+  setTexture(srcs: Array<string>) {
+    let rng:number = Math.floor(Math.random() * srcs.length);
+    this.element.src = srcs[rng];
+  }
+}
+
 export class Color {
   r: number;
   g: number;

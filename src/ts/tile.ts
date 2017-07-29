@@ -5,6 +5,8 @@ import { Canvas } from "./canvas";
 import { Debug } from "./debug";
 import { coordinatesToString } from "./general";
 import { Mouse } from "./mouse";
+import { Environment } from "./environment";
+import { Texture } from "./general";
 
 declare var noise;
 
@@ -12,8 +14,9 @@ export class Tile {
 
   static size: number = 40;
   static hover = "";
-  texture:HTMLImageElement = new Image();
   name: string;
+  texture: Texture;
+  environment: Environment;
   color: Color;
   x: number;
   y: number;
@@ -38,12 +41,6 @@ export class Tile {
     Tile.hover = tilestring;
   }
 
-  //randomly pick a texture for the tile (or if only 1 then that one)
-  setTexture(src: Array<string>) {
-    let rng:number = Math.floor(Math.random() * src.length);
-    this.texture.src = src[rng];
-  }
-
   static generateNoise(x: number, y: number, seed?: number, abs:boolean = false) {
     if (seed != null) {
       noise.seed(seed);
@@ -66,7 +63,7 @@ export class Tile {
         Canvas.context.fillStyle = this.color.toRGBA();
         Canvas.context.fillRect(x, y, Tile.size, Tile.size);
       } else {
-        Canvas.context.drawImage(this.texture, x, y, Tile.size, Tile.size);
+        Canvas.context.drawImage(this.texture.element, x, y, Tile.size, Tile.size);
       }
     }
     if (Debug.worldtext) {
@@ -89,84 +86,54 @@ export class Tile {
 }
 
 export class Grass extends Tile {
-  static id:number = 1;
   color: Color = new Color(77, 189, 51, 1);
   name: string = "Grass";
-  textures: Array<string> = [
+  texture: Texture = new Texture([
     "src/img/grass_3.png",
     "src/img/grass_4.png"
-  ];
-  constructor(x:number, y:number) {
-    super(x, y);
-    this.setTexture(this.textures);
-  }
+  ]);
 }
 
 export class DeepWater extends Tile {
-  static id:number = 2;
   color: Color = new Color(38, 98, 133, 1);
   name: string = "Deep Water";
-  textures: Array<string> = [
+  texture: Texture = new Texture([
     "src/img/water.png",
     "src/img/water_1.png"
-  ];
-  constructor(x:number, y:number) {
-    super(x, y);
-    this.setTexture(this.textures);
-  }
+  ]);
 }
 
 export class Water extends Tile {
-  static id:number = 2;
   color: Color = new Color(64, 164, 223, 1);
   name: string = "Water";
-  textures: Array<string> = [
+  texture: Texture = new Texture([
     "src/img/water.png",
     "src/img/water_1.png"
-  ];
-  constructor(x:number, y:number) {
-    super(x, y);
-    this.setTexture(this.textures);
-  }
+  ]);
 }
 
 export class Sand extends Tile {
-  static id:number = 3;
   color: Color = new Color(237, 201, 175, 1);
   name: string = "Sand";
-  textures: Array<string> = [
+  texture: Texture = new Texture([
     "src/img/sand.png",
     "src/img/sand_1.png",
     "src/img/sand_2.png"
-  ];
-  constructor(x:number, y:number) {
-    super(x, y);
-    this.setTexture(this.textures);
-  }
+  ]);
 }
 
 export class Ice extends Tile {
-  static id:number = 4;
   color: Color = new Color(212,240,255, 1);
   name: string = "Ice";
-  textures: Array<string> = [
+  texture: Texture = new Texture([
     "src/img/ice.png"
-  ];
-  constructor(x:number, y:number) {
-    super(x, y);
-    this.setTexture(this.textures);
-  }
+  ]);
 }
 
 export class Snow extends Tile {
-  static id:number = 5;
   color: Color = new Color(248, 248, 255, 1);
   name: string = "Snow";
-  textures: Array<string> = [
+  texture: Texture = new Texture([
     "src/img/snow.png"
-  ];
-  constructor(x:number, y:number) {
-    super(x, y);
-    this.setTexture(this.textures);
-  }
+  ]);
 }
