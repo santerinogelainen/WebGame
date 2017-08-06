@@ -17,7 +17,12 @@ export class Tiletip {
     Canvas.context.beginPath();
     Canvas.context.font = "15px sans-serif";
     Canvas.context.textBaseline = "top";
-    let text: string = tile.name;
+    let text: string;
+    if (tile.environment != null) {
+      text = tile.name + " (" + tile.environment.name + ")";
+    } else {
+      text = tile.name;
+    }
     let width: number = Canvas.context.measureText(text).width;
     let height: number = Tiletip.fontsize;
     let x: number = Tiletip.getX(width);

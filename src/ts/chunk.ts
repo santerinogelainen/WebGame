@@ -57,15 +57,18 @@ export class Chunk {
         let tile;
         let x = r + (this.x * Chunk.tilesperside);
         let y = c + (this.y * Chunk.tilesperside);
-        let islandnoise = Tile.generateNoise((x / Biome.islandsize), (y / Biome.islandsize), seed.island, true) * Biome.islandmax;
+        /*let islandnoise = Tile.generateNoise((x / Biome.islandsize), (y / Biome.islandsize), seed.island, true) * Biome.islandmax;
         if (islandnoise >= Sea.noise.min && islandnoise <= Sea.noise.max) {
           tile = Sea.getTile(r, c, islandnoise);
-        } else {
+        } else {*/
           let temp: number = Tile.generateNoise((x / Biome.tempsize), (y / Biome.tempsize), seed.biome.temp) * Biome.tempmax;
           let hum: number = Tile.generateNoise((x / Biome.humsize), (y / Biome.humsize), seed.biome.hum) * Biome.hummax;
-          let biome = this.getBiome(temp, hum);
+          let alt: number = Tile.generateNoise((x / Biome.altsize), (y / Biome.altsize), seed.biome.alt) * Biome.altmax;
+          let biome = this.getBiome(temp, hum, alt);
           tile = biome.getTile(r, c);
-        }
+
+          //tile.setColorOffset(biome.calculateColorOffset(alt));
+        //}
         let name: string = coordinatesToString(r, c);
         this.tiles[name] = tile;
         c++;
@@ -77,7 +80,7 @@ export class Chunk {
   /*
   * Returns the biome that matches the temperature and humidity noise given
   */
-  getBiome(temp: number, hum: number) {
+  getBiome(temp: number, hum: number, alt: number) {
     for (let biome in Biome.get) {
       let b = Biome.get[biome];
       if ((temp >= b.temperature.min && temp <= b.temperature.max) && (hum >= b.humidity.min && hum <= b.humidity.max)) {

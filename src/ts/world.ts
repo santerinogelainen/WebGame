@@ -11,7 +11,8 @@ export class World {
     island: 0,
     biome: {
       temp: 0,
-      hum: 0
+      hum: 0,
+      alt: 0
     }
   };
   //all the chunks that have been loaded
@@ -189,5 +190,6 @@ export class World {
     this.seed.island = rng(1, 65536);
     this.seed.biome.temp = rng(1, 65536);
     this.seed.biome.hum = rng(1, 65536);
+    this.seed.biome.alt = rng(1, 65536);
   }
 }

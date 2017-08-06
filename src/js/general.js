@@ -50,6 +50,9 @@ var Texture = (function () {
 exports.Texture = Texture;
 var Color = (function () {
     function Color(r, g, b, a) {
+        this.set(r, g, b, a);
+    }
+    Color.prototype.set = function (r, g, b, a) {
         this.r = r;
         this.g = g;
         this.b = b;
@@ -59,9 +62,26 @@ var Color = (function () {
         else {
             this.a = 1;
         }
-    }
+    };
+    /*
+    * returns a canvas.context.*style compatible string of the color
+    */
     Color.prototype.toRGBA = function () {
         return "rgba(" + this.r + ", " + this.g + ", " + this.b + ", " + this.a + ")";
+    };
+    /*
+    * offsets the color (downwards) by the amount given
+    */
+    Color.prototype.offset = function (channel, amount) {
+        if (this[channel] == null) {
+            console.log("Unknown channel " + channel);
+        }
+        else {
+            this[channel] -= amount;
+            if (this[channel] < 0) {
+                this[channel] = 0;
+            }
+        }
     };
     return Color;
 }());

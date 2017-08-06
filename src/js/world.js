@@ -16,7 +16,8 @@ var World = (function () {
             island: 0,
             biome: {
                 temp: 0,
-                hum: 0
+                hum: 0,
+                alt: 0
             }
         };
         //all the chunks that have been loaded
@@ -179,6 +180,7 @@ var World = (function () {
         this.seed.island = general_3.rng(1, 65536);
         this.seed.biome.temp = general_3.rng(1, 65536);
         this.seed.biome.hum = general_3.rng(1, 65536);
+        this.seed.biome.alt = general_3.rng(1, 65536);
     };
     return World;
 }());

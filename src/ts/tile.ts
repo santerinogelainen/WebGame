@@ -14,7 +14,7 @@ declare var noise;
 
 export class Tile {
 
-  static size: number = 40;
+  static size: number = 50;
   static hover = "";
   name: string;
   texture: Texture;
@@ -52,6 +52,12 @@ export class Tile {
     } else {
       return noise.simplex2(x, y);
     }
+  }
+
+  setColorOffset(offset) {
+    this.color.offset("r", offset);
+    this.color.offset("g", offset);
+    this.color.offset("b", offset);
   }
 
   draw(x: number, y: number, chunk: boolean, tile: string) {
@@ -147,4 +153,11 @@ export class Snow extends Tile {
   texture: Texture = new Texture([
     "src/img/snow.png"
   ]);
+  constructor(x, y, tree: Boolean = false) {
+    super(x, y);
+    if (tree) {
+      this.environment = new Tree();
+      this.environment.color.set(50, 132, 191);
+    }
+  }
 }

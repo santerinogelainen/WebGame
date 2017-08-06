@@ -13,6 +13,7 @@ exports.__esModule = true;
 var tiles = require("./tile");
 var environment_1 = require("./environment");
 var general_1 = require("./general");
+var settings_1 = require("./settings");
 var BiomeTemplate = (function () {
     function BiomeTemplate() {
     }
@@ -20,18 +21,28 @@ var BiomeTemplate = (function () {
     //this function returns a new Tile of the biomes type
     BiomeTemplate.prototype.getTile = function (x, y) { };
     ;
+    BiomeTemplate.prototype.calculateColorOffset = function (noise) {
+        var fullarea = this.temperature.max - this.temperature.min;
+        var progress = this.temperature.max - noise;
+        return Math.round((progress / fullarea) * settings_1.Settings.maxcolornoiseoffset);
+    };
+    ;
     return BiomeTemplate;
 }());
 var Plains = (function (_super) {
     __extends(Plains, _super);
     function Plains() {
-        var _this = _super.call(this) || this;
+        var _this = _super !== null && _super.apply(this, arguments) || this;
         _this.temperature = {
             min: -50,
             max: 50
         };
         _this.humidity = {
             min: -50,
+            max: 50
+        };
+        _this.altitude = {
+            min: 0,
             max: 50
         };
         return _this;
@@ -42,34 +53,35 @@ var Plains = (function (_super) {
     return Plains;
 }(BiomeTemplate));
 Plains.biomename = "Plains";
-var Sea = (function () {
+var Sea = (function (_super) {
+    __extends(Sea, _super);
     function Sea() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.temperature = {
+            min: -50,
+            max: 50
+        };
+        _this.humidity = {
+            min: 25,
+            max: 50
+        };
+        _this.altitude = {
+            min: -50,
+            max: 0
+        };
+        return _this;
     }
-    Sea.getTile = function (x, y, noise) {
-        if (noise < 24) {
-            return new tiles.DeepWater(x, y);
-        }
-        else {
-            if (noise <= 27) {
-                return new tiles.Water(x, y);
-            }
-            else {
-                return new tiles.Sand(x, y);
-            }
-        }
+    Sea.prototype.getTile = function (x, y) {
+        return new tiles.DeepWater(x, y);
     };
     return Sea;
-}());
+}(environment_1.Environment));
 Sea.biomename = "Sea";
-Sea.noise = {
-    min: 0,
-    max: 30
-};
 exports.Sea = Sea;
 var Desert = (function (_super) {
     __extends(Desert, _super);
     function Desert() {
-        var _this = _super.call(this) || this;
+        var _this = _super !== null && _super.apply(this, arguments) || this;
         _this.temperature = {
             min: 25,
             max: 50
@@ -77,6 +89,10 @@ var Desert = (function (_super) {
         _this.humidity = {
             min: 0,
             max: 25
+        };
+        _this.altitude = {
+            min: 0,
+            max: 50
         };
         return _this;
     }
@@ -98,6 +114,10 @@ var Forest = (function (_super) {
             min: -25,
             max: 50
         };
+        _this.altitude = {
+            min: 0,
+            max: 50
+        };
         return _this;
     }
     Forest.prototype.getTile = function (x, y) {
@@ -114,7 +134,7 @@ Forest.biomename = "Forest";
 var Winter = (function (_super) {
     __extends(Winter, _super);
     function Winter() {
-        var _this = _super.call(this) || this;
+        var _this = _super !== null && _super.apply(this, arguments) || this;
         _this.temperature = {
             min: -50,
             max: -25
@@ -122,6 +142,10 @@ var Winter = (function (_super) {
         _this.humidity = {
             min: -50,
             max: -25
+        };
+        _this.altitude = {
+            min: 35,
+            max: 50
         };
         return _this;
     }
@@ -137,8 +161,17 @@ var WinterForest = (function (_super) {
         var _this = _super !== null && _super.apply(this, arguments) || this;
         _this.temperature = { min: -50, max: -25 };
         _this.humidity = { min: -25, max: 50 };
+        _this.altitude = { min: 35, max: 50 };
         return _this;
     }
+    WinterForest.prototype.getTile = function (x, y) {
+        var n = general_1.rng(1, 10);
+        if (n > environment_1.Environment.treernglimit) {
+            return new tiles.Snow(x, y, true);
+        }
+        return new tiles.Snow(x, y);
+    };
+    ;
     return WinterForest;
 }(Winter));
 WinterForest.biomename = "Winter Forest";
@@ -155,6 +188,9 @@ WinterForest.biomename = "Winter Forest";
     return new tiles.Ice(x, y);
   }
 }*/
+/*
+* "static" class, holds all the settings for the biomes
+*/
 var Biome = (function () {
     function Biome() {
     }
@@ -162,15 +198,18 @@ var Biome = (function () {
 }());
 Biome.islandsize = 500;
 Biome.islandmax = 100;
-Biome.tempsize = 150;
 Biome.tempmax = 50;
-Biome.humsize = 150;
 Biome.hummax = 50;
+Biome.altmax = 50;
+Biome.tempsize = 150;
+Biome.humsize = 150;
+Biome.altsize = 150;
 Biome.get = {
     "forest": new Forest(),
     "desert": new Desert(),
     "winterforest": new WinterForest(),
     "winter": new Winter(),
+    "sea": new Sea(),
     "plains": new Plains()
 };
 exports.Biome = Biome;

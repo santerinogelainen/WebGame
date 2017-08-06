@@ -49,7 +49,7 @@ var Game = (function () {
     Game.getDebugLines = function () {
         var debugLines = [
             "FPS: " + Game.curFps + " (limit: " + settings_1.Settings.fpslimit + ")",
-            "Loaded chunks: " + Game.world.onscreen.join(", "),
+            /*"Loaded chunks: " + Game.world.onscreen.join(", "),*/
             "Fixed position: x=" + Game.player.position.screen.x + " y=" + Game.player.position.screen.y,
             "World position: x=" + Game.player.position.world.x + " y=" + Game.player.position.world.y,
             "Chunk position: x=" + Game.player.position.chunk.x + " y=" + Game.player.position.chunk.y,

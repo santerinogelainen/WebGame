@@ -48,6 +48,11 @@ var Tile = (function () {
             return noise.simplex2(x, y);
         }
     };
+    Tile.prototype.setColorOffset = function (offset) {
+        this.color.offset("r", offset);
+        this.color.offset("g", offset);
+        this.color.offset("b", offset);
+    };
     Tile.prototype.draw = function (x, y, chunk, tile) {
         canvas_1.Canvas.context.beginPath();
         if (debug_1.Debug.lines) {
@@ -84,7 +89,7 @@ var Tile = (function () {
     };
     return Tile;
 }());
-Tile.size = 40;
+Tile.size = 50;
 Tile.hover = "";
 exports.Tile = Tile;
 var Grass = (function (_super) {
@@ -168,13 +173,18 @@ var Ice = (function (_super) {
 exports.Ice = Ice;
 var Snow = (function (_super) {
     __extends(Snow, _super);
-    function Snow() {
-        var _this = _super !== null && _super.apply(this, arguments) || this;
+    function Snow(x, y, tree) {
+        if (tree === void 0) { tree = false; }
+        var _this = _super.call(this, x, y) || this;
         _this.color = new general_1.Color(248, 248, 255, 1);
         _this.name = "Snow";
         _this.texture = new general_3.Texture([
             "src/img/snow.png"
         ]);
+        if (tree) {
+            _this.environment = new environment_1.Tree();
+            _this.environment.color.set(50, 132, 191);
+        }
         return _this;
     }
     return Snow;

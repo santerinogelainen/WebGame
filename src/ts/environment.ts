@@ -30,7 +30,7 @@ export class Environment {
       Canvas.context.fillStyle = this.color.toRGBA();
       switch (this.shape) {
         case Shape.CIRCLE:
-          Canvas.context.arc(x, y, this.size.x, 0, 2 * Math.PI);
+          Canvas.context.arc(x, y, this.size.x / 2, 0, 2 * Math.PI);
           Canvas.context.fill();
           break;
         case Shape.RECTANGLE:
@@ -56,12 +56,20 @@ export class Tree extends Environment {
   texture: Texture = new Texture(["src/img/big_oak.png"]);
   name: string = "Tree";
   shape: Shape = Shape.TRIANGLE;
-  offset = {
-    x: 20,
-    y: 40
-  };
   size = {
-    x: 80,
-    y: 80
+    x: 50,
+    y: 50
+  };
+}
+
+
+export class Rock extends Environment {
+  color: Color = new Color(128, 132, 135);
+  texture: Texture = new Texture(["src/img/big_oak.png"]);
+  name: string = "Rock";
+  shape: Shape = Shape.CIRCLE;
+  size = {
+    x: 50,
+    y: 50
   };
 }

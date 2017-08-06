@@ -11,7 +11,13 @@ var Tiletip = (function () {
         canvas_1.Canvas.context.beginPath();
         canvas_1.Canvas.context.font = "15px sans-serif";
         canvas_1.Canvas.context.textBaseline = "top";
-        var text = tile.name;
+        var text;
+        if (tile.environment != null) {
+            text = tile.name + " (" + tile.environment.name + ")";
+        }
+        else {
+            text = tile.name;
+        }
         var width = canvas_1.Canvas.context.measureText(text).width;
         var height = Tiletip.fontsize;
         var x = Tiletip.getX(width);

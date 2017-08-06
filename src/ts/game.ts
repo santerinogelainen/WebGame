@@ -62,7 +62,7 @@ export class Game {
   static getDebugLines(): Array<string> {
     let debugLines:Array<string> = [
       "FPS: " + Game.curFps + " (limit: " + Settings.fpslimit + ")",
-      "Loaded chunks: " + Game.world.onscreen.join(", "),
+      /*"Loaded chunks: " + Game.world.onscreen.join(", "),*/
       "Fixed position: x=" + Game.player.position.screen.x + " y=" + Game.player.position.screen.y,
       "World position: x=" + Game.player.position.world.x + " y=" + Game.player.position.world.y,
       "Chunk position: x=" + Game.player.position.chunk.x + " y=" + Game.player.position.chunk.y,

@@ -4,7 +4,6 @@ var tile_1 = require("./tile");
 var general_1 = require("./general");
 var canvas_1 = require("./canvas");
 var biome_1 = require("./biome");
-var biome_2 = require("./biome");
 var debug_1 = require("./debug");
 var mouse_1 = require("./mouse");
 var Chunk = (function () {
@@ -46,16 +45,17 @@ var Chunk = (function () {
                 var tile = void 0;
                 var x = r + (this.x * Chunk.tilesperside);
                 var y = c + (this.y * Chunk.tilesperside);
-                var islandnoise = tile_1.Tile.generateNoise((x / biome_1.Biome.islandsize), (y / biome_1.Biome.islandsize), seed.island, true) * biome_1.Biome.islandmax;
-                if (islandnoise >= biome_2.Sea.noise.min && islandnoise <= biome_2.Sea.noise.max) {
-                    tile = biome_2.Sea.getTile(r, c, islandnoise);
-                }
-                else {
-                    var temp = tile_1.Tile.generateNoise((x / biome_1.Biome.tempsize), (y / biome_1.Biome.tempsize), seed.biome.temp) * biome_1.Biome.tempmax;
-                    var hum = tile_1.Tile.generateNoise((x / biome_1.Biome.humsize), (y / biome_1.Biome.humsize), seed.biome.hum) * biome_1.Biome.hummax;
-                    var biome = this.getBiome(temp, hum);
-                    tile = biome.getTile(r, c);
-                }
+                /*let islandnoise = Tile.generateNoise((x / Biome.islandsize), (y / Biome.islandsize), seed.island, true) * Biome.islandmax;
+                if (islandnoise >= Sea.noise.min && islandnoise <= Sea.noise.max) {
+                  tile = Sea.getTile(r, c, islandnoise);
+                } else {*/
+                var temp = tile_1.Tile.generateNoise((x / biome_1.Biome.tempsize), (y / biome_1.Biome.tempsize), seed.biome.temp) * biome_1.Biome.tempmax;
+                var hum = tile_1.Tile.generateNoise((x / biome_1.Biome.humsize), (y / biome_1.Biome.humsize), seed.biome.hum) * biome_1.Biome.hummax;
+                var alt = tile_1.Tile.generateNoise((x / biome_1.Biome.altsize), (y / biome_1.Biome.altsize), seed.biome.alt) * biome_1.Biome.altmax;
+                var biome = this.getBiome(temp, hum, alt);
+                tile = biome.getTile(r, c);
+                //tile.setColorOffset(biome.calculateColorOffset(alt));
+                //}
                 var name_1 = general_1.coordinatesToString(r, c);
                 this.tiles[name_1] = tile;
                 c++;
@@ -66,7 +66,7 @@ var Chunk = (function () {
     /*
     * Returns the biome that matches the temperature and humidity noise given
     */
-    Chunk.prototype.getBiome = function (temp, hum) {
+    Chunk.prototype.getBiome = function (temp, hum, alt) {
         for (var biome in biome_1.Biome.get) {
             var b = biome_1.Biome.get[biome];
             if ((temp >= b.temperature.min && temp <= b.temperature.max) && (hum >= b.humidity.min && hum <= b.humidity.max)) {

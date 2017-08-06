@@ -2,6 +2,7 @@
 import * as tiles from "./tile";
 import { Environment } from "./environment";
 import { rng } from "./general";
+import { Settings } from "./settings";
 
 interface Noise {
   min: number,
@@ -12,10 +13,17 @@ class BiomeTemplate {
   static biomename: string;
   temperature: Noise;
   humidity: Noise;
+  altitude: Noise;
 
   //each biome has it's own implementation of getTile
   //this function returns a new Tile of the biomes type
   getTile(x: number, y:number){};
+
+  calculateColorOffset(noise): number {
+    let fullarea: number = this.temperature.max - this.temperature.min;
+    let progress: number = this.temperature.max - noise;
+    return Math.round((progress / fullarea) * Settings.maxcolornoiseoffset);
+  };
 }
 
 class Plains extends BiomeTemplate {
@@ -28,33 +36,33 @@ class Plains extends BiomeTemplate {
     min: -50,
     max: 50
   };
-
-  constructor() {
-    super();
-  }
+  altitude = {
+    min: 0,
+    max: 50
+  };
 
   getTile(x: number, y: number) {
     return new tiles.Grass(x, y);
   }
 }
 
-export class Sea {
+export class Sea extends Environment {
   static biomename = "Sea";
-  static noise = {
-    min: 0,
-    max: 30
+  temperature = {
+    min: -50,
+    max: 50
+  };
+  humidity = {
+    min: 25,
+    max: 50
+  };
+  altitude = {
+    min: -50,
+    max: 0
   };
 
-  static getTile(x: number, y: number, noise: number) {
-    if ( noise < 24 ) {
+  getTile(x: number, y: number) {
       return new tiles.DeepWater(x, y);
-    } else {
-      if ( noise <= 27 ) {
-        return new tiles.Water(x, y);
-      } else {
-        return new tiles.Sand(x, y);
-      }
-    }
   }
 }
 
@@ -68,10 +76,10 @@ class Desert extends BiomeTemplate {
     min: 0,
     max: 25
   };
-
-  constructor() {
-    super();
-  }
+  altitude = {
+    min: 0,
+    max: 50
+  };
 
   getTile(x: number, y: number) {
     return new tiles.Sand(x, y);
@@ -86,6 +94,10 @@ class Forest extends Plains {
   };
   humidity = {
     min: -25,
+    max: 50
+  };
+  altitude = {
+    min: 0,
     max: 50
   };
   getTile(x: number, y: number) {
@@ -107,10 +119,10 @@ class Winter extends BiomeTemplate {
     min: -50,
     max: -25
   };
-
-  constructor() {
-    super();
-  }
+  altitude = {
+    min: 35,
+    max: 50
+  };
 
   getTile(x: number, y: number) {
     return new tiles.Snow(x, y);
@@ -121,6 +133,15 @@ class WinterForest extends Winter {
   static biomename = "Winter Forest";
   temperature = {min: -50, max: -25};
   humidity = {min: -25, max: 50};
+  altitude = {min: 35, max: 50};
+
+  getTile(x: number, y: number) {
+    let n: number = rng(1, 10);
+    if (n > Environment.treernglimit) {
+      return new tiles.Snow(x, y, true);
+    }
+    return new tiles.Snow(x, y);
+  };
 }
 
 /*class FrozenWater extends BiomeTemplate {
@@ -137,18 +158,30 @@ class WinterForest extends Winter {
   }
 }*/
 
+/*
+* "static" class, holds all the settings for the biomes
+*/
+
+
+// TO DO!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// implement islands again
+
+
 export class Biome {
   static islandsize: number = 500;
   static islandmax: number = 100;
-  static tempsize: number = 150;
   static tempmax: number = 50;
-  static humsize: number = 150;
   static hummax: number = 50;
+  static altmax: number = 50;
+  static tempsize: number = 150;
+  static humsize: number = 150;
+  static altsize: number = 150;
   static get = {
     "forest": new Forest(),
     "desert": new Desert(),
     "winterforest": new WinterForest(),
     "winter": new Winter(),
+    "sea": new Sea(),
     "plains": new Plains()
   };
 }

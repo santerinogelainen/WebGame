@@ -43,6 +43,10 @@ export class Color {
   a: number;
 
   constructor(r: number, g: number, b:number, a?:number) {
+    this.set(r, g, b, a);
+  }
+
+  set(r: number, g: number, b: number, a?: number) {
     this.r = r;
     this.g = g;
     this.b = b;
@@ -53,8 +57,25 @@ export class Color {
     }
   }
 
-  toRGBA() {
+  /*
+  * returns a canvas.context.*style compatible string of the color
+  */
+  toRGBA(): string {
     return "rgba(" + this.r + ", " + this.g + ", " + this.b + ", " + this.a + ")";
+  }
+
+  /*
+  * offsets the color (downwards) by the amount given
+  */
+  offset(channel, amount) {
+    if (this[channel] == null) {
+      console.log("Unknown channel " + channel);
+    } else {
+      this[channel] -= amount;
+      if (this[channel] < 0) {
+        this[channel] = 0;
+      }
+    }
   }
 }
 

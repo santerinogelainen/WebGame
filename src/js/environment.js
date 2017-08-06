@@ -34,7 +34,7 @@ var Environment = (function () {
             canvas_1.Canvas.context.fillStyle = this.color.toRGBA();
             switch (this.shape) {
                 case general_3.Shape.CIRCLE:
-                    canvas_1.Canvas.context.arc(x, y, this.size.x, 0, 2 * Math.PI);
+                    canvas_1.Canvas.context.arc(x, y, this.size.x / 2, 0, 2 * Math.PI);
                     canvas_1.Canvas.context.fill();
                     break;
                 case general_3.Shape.RECTANGLE:
@@ -66,16 +66,29 @@ var Tree = (function (_super) {
         _this.texture = new general_2.Texture(["src/img/big_oak.png"]);
         _this.name = "Tree";
         _this.shape = general_3.Shape.TRIANGLE;
-        _this.offset = {
-            x: 20,
-            y: 40
-        };
         _this.size = {
-            x: 80,
-            y: 80
+            x: 50,
+            y: 50
         };
         return _this;
     }
     return Tree;
 }(Environment));
 exports.Tree = Tree;
+var Rock = (function (_super) {
+    __extends(Rock, _super);
+    function Rock() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.color = new general_1.Color(128, 132, 135);
+        _this.texture = new general_2.Texture(["src/img/big_oak.png"]);
+        _this.name = "Rock";
+        _this.shape = general_3.Shape.CIRCLE;
+        _this.size = {
+            x: 50,
+            y: 50
+        };
+        return _this;
+    }
+    return Rock;
+}(Environment));
+exports.Rock = Rock;
